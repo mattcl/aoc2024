@@ -6,7 +6,16 @@ image_resource:
     tag: 1.82
 
 inputs:
+  - name: aoc-tools
   - name: repo
+
+outputs:
+  - name: release
+
+params:
+  CARGO_REGISTRIES_ANCALAGON_INDEX:
+  CARGO_REGISTRIES_ANCALAGON_TOKEN:
+  TARGET: "x86_64-unknown-linux-gnu"
 
 caches:
   # yeah, I'm not sure how I feel about caching the registry like this,
@@ -17,5 +26,4 @@ caches:
   - path: repo/target
 
 run:
-  dir: repo
-  path: ci/scripts/build.sh
+  path: repo/ci/scripts/build.sh

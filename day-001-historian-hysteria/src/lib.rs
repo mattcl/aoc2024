@@ -1,7 +1,11 @@
 use std::str::FromStr;
 
-use anyhow::anyhow;
 use aoc_plumbing::Problem;
+use nom::{
+    character::complete::{self, space1},
+    sequence::separated_pair,
+    IResult,
+};
 use rustc_hash::{FxBuildHasher, FxHashMap};
 
 #[derive(Debug, Clone)]
@@ -21,12 +25,8 @@ impl FromStr for HistorianHysteria {
             FxHashMap::with_capacity_and_hasher(1000, FxBuildHasher);
 
         for line in s.trim().lines() {
-            let (l, r) = line
-                .split_once(" ")
-                .ok_or_else(|| anyhow!("invalid input"))?;
-            let lv: i32 = l.trim().parse()?;
+            let (_, (lv, rv)) = parse_line(line).map_err(|e| e.to_owned())?;
             left.push(lv);
-            let rv: i32 = r.trim().parse()?;
             right.push(rv);
             counts.entry(rv).and_modify(|e| *e += 1).or_insert(1);
         }
@@ -40,6 +40,10 @@ impl FromStr for HistorianHysteria {
             counts,
         })
     }
+}
+
+fn parse_line(input: &str) -> IResult<&str, (i32, i32)> {
+    separated_pair(complete::i32, space1, complete::i32)(input)
 }
 
 impl Problem for HistorianHysteria {

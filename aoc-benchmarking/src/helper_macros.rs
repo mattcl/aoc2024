@@ -68,4 +68,3 @@ macro_rules! aoc_benches {
         }
     };
 }
-

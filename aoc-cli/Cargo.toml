@@ -16,3 +16,4 @@ clap = { version = "4", features = ["cargo", "env", "derive", "wrap_help"] }
 clap_complete = "4"
 serde = { workspace = true }
 serde_json = { workspace = true }
+historian-hysteria = { path = "../day-001-historian-hysteria" }

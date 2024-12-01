@@ -25,7 +25,7 @@ just bench-all
 
 # summary
 set -ex
-# aoc-tools criterion-summary target/criterion
+aoc-tools criterion-summary target/criterion
 
 # build the cli
 just build-cli

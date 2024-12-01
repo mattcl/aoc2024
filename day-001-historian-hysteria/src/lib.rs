@@ -28,11 +28,11 @@ impl FromStr for HistorianHysteria {
             let (_, (lv, rv)) = parse_line(line).map_err(|e| e.to_owned())?;
             left.push(lv);
             right.push(rv);
-            counts.entry(rv).and_modify(|e| *e += 1).or_insert(1);
+            counts.entry(rv).and_modify(|e| *e += rv).or_insert(rv);
         }
 
-        left.sort();
-        right.sort();
+        left.sort_unstable();
+        right.sort_unstable();
 
         Ok(Self {
             left,
@@ -68,7 +68,7 @@ impl Problem for HistorianHysteria {
         Ok(self
             .left
             .iter()
-            .map(|v| v * self.counts.get(v).copied().unwrap_or_default())
+            .map(|v| self.counts.get(v).copied().unwrap_or_default())
             .sum())
     }
 }

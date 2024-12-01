@@ -2,30 +2,31 @@ use std::str::FromStr;
 
 use anyhow::anyhow;
 use aoc_plumbing::Problem;
-use rustc_hash::{FxHashMap, FxHashSet};
+use rustc_hash::{FxBuildHasher, FxHashMap};
 
 #[derive(Debug, Clone)]
 pub struct HistorianHysteria {
-    left: Vec<i64>,
-    right: Vec<i64>,
-    counts: FxHashMap<i64, i64>,
+    left: Vec<i32>,
+    right: Vec<i32>,
+    counts: FxHashMap<i32, i32>,
 }
 
 impl FromStr for HistorianHysteria {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut left = Vec::default();
-        let mut right = Vec::default();
-        let mut counts: FxHashMap<i64, i64> = FxHashMap::default();
+        let mut left = Vec::with_capacity(1000);
+        let mut right = Vec::with_capacity(1000);
+        let mut counts: FxHashMap<i32, i32> =
+            FxHashMap::with_capacity_and_hasher(1000, FxBuildHasher);
 
-        for line in s.lines() {
+        for line in s.trim().lines() {
             let (l, r) = line
                 .split_once(" ")
                 .ok_or_else(|| anyhow!("invalid input"))?;
-            let lv: i64 = l.trim().parse()?;
+            let lv: i32 = l.trim().parse()?;
             left.push(lv);
-            let rv: i64 = r.trim().parse()?;
+            let rv: i32 = r.trim().parse()?;
             right.push(rv);
             counts.entry(rv).and_modify(|e| *e += 1).or_insert(1);
         }
@@ -47,8 +48,8 @@ impl Problem for HistorianHysteria {
     const README: &'static str = include_str!("../README.md");
 
     type ProblemError = anyhow::Error;
-    type P1 = i64;
-    type P2 = i64;
+    type P1 = i32;
+    type P2 = i32;
 
     fn part_one(&mut self) -> Result<Self::P1, Self::ProblemError> {
         Ok(self

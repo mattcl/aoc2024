@@ -56,15 +56,13 @@ fn process_line(input: &str, buffer: &mut Vec<Candidate>) -> anyhow::Result<(boo
         first_candidate.push(second);
 
         for part in parts {
-            let untouched = first_candidate;
-
             let val: i8 = part.parse()?;
 
-            first_candidate.push(val);
             buffer.retain_mut(|c| c.push(val));
 
-            if untouched.valid {
-                buffer.push(untouched);
+            if first_candidate.valid {
+                buffer.push(first_candidate);
+                first_candidate.push(val);
             } else if buffer.is_empty() {
                 return Ok((false, false));
             }

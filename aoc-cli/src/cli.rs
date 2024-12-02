@@ -8,6 +8,7 @@ use aoc_plumbing::Problem;
 use clap::{Args, CommandFactory, Parser, Subcommand};
 use clap_complete::{generate, shells::Zsh};
 use historian_hysteria::HistorianHysteria;
+use red_nosed_reports::RedNosedReports;
 // import_marker
 
 // I'm not proud
@@ -166,5 +167,6 @@ impl GenerateCompletions {
 
 generate_cli! {
     (HistorianHysteria, 1),
+    (RedNosedReports, 2),
     // command_marker
 }

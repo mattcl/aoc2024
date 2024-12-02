@@ -79,17 +79,19 @@ dependencies = [
  "aoc-plumbing",
  "criterion",
  "historian-hysteria",
+ "red-nosed-reports",
 ]
 
 [[package]]
 name = "aoc-cli"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
  "clap",
  "clap_complete",
  "historian-hysteria",
+ "red-nosed-reports",
  "serde",
  "serde_json",
 ]
@@ -519,6 +521,17 @@ checksum = "1465873a3dfdaa8ae7cb14b4383657caab0b3e8a0aa9ae8e04b044854c8dfce2"
 dependencies = [
  "crossbeam-deque",
  "crossbeam-utils",
+]
+
+[[package]]
+name = "red-nosed-reports"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-plumbing",
+ "nom",
+ "rustc-hash",
+ "serde",
 ]
 
 [[package]]

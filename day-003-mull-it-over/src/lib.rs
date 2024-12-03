@@ -6,7 +6,7 @@ use nom::{
     bytes::complete::{tag, take_until},
     character::complete,
     combinator,
-    multi::{fold_many0, fold_many1},
+    multi::fold_many1,
     sequence::{delimited, preceded, separated_pair, terminated},
     IResult,
 };

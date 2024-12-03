@@ -1,15 +1,6 @@
 use std::str::FromStr;
 
 use aoc_plumbing::Problem;
-use nom::{
-    branch,
-    bytes::complete::{tag, take_until},
-    character::complete,
-    combinator,
-    multi::fold_many1,
-    sequence::{delimited, preceded, separated_pair, terminated},
-    IResult,
-};
 
 #[derive(Debug, Clone)]
 pub struct MullItOver {
@@ -22,88 +13,93 @@ impl FromStr for MullItOver {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         // again, easier to solve both during the parsing step because otherwise
-        // I'd have to own the &str by allocating a String. I still have to make
-        // two passes, though.
-        let (_, part1) = parse_part1_input(s).map_err(|e| e.to_owned())?;
-        let (_, part2) = parse_part2_input(s).map_err(|e| e.to_owned())?;
+        // I'd have to own the &str by allocating a String.
+
+        let len = s.len();
+        let bytes = s.as_bytes();
+        let mut start = 0;
+        let mut part1 = 0;
+        let mut part2 = 0;
+        let mut enable = true;
+
+        // we get away with this because we're pretty sure the input is ascii
+        'outer: while start < len {
+            if bytes[start] != b'm' && bytes[start] != b'd' {
+                start += 1;
+                continue;
+            }
+
+            if bytes[start] == b'd' {
+                if s[start..].starts_with("don't()") {
+                    enable = false;
+                    start += 7;
+                } else if s[start..].starts_with("do()") {
+                    enable = true;
+                    start += 4;
+                } else {
+                    start += 1;
+                }
+                continue;
+            }
+
+            if bytes[start] == b'm' && s[start..].starts_with("mul(") {
+                // left
+                start += 4;
+                let mut cur = start;
+                loop {
+                    if bytes[cur] == b',' {
+                        break;
+                    }
+
+                    if !bytes[cur].is_ascii_digit() {
+                        start = cur;
+                        continue 'outer;
+                    }
+
+                    cur += 1;
+                }
+                if start == cur {
+                    start += 1;
+                    continue;
+                }
+
+                let left: i64 = s[start..cur].parse()?;
+
+                // right
+                start = cur + 1;
+                cur = start;
+                loop {
+                    if bytes[cur] == b')' {
+                        break;
+                    }
+
+                    if !bytes[cur].is_ascii_digit() {
+                        start = cur;
+                        continue 'outer;
+                    }
+
+                    cur += 1;
+                }
+                if start == cur {
+                    start += 1;
+                    continue;
+                }
+                let right: i64 = s[start..cur].parse()?;
+
+                let prod = left * right;
+                part1 += prod;
+                if enable {
+                    part2 += prod;
+                }
+
+                start = cur + 1;
+                continue;
+            }
+
+            start += 1;
+        }
 
         Ok(Self { part1, part2 })
-    }
-}
-
-fn parse_part1_input(input: &str) -> IResult<&str, i64> {
-    fold_many1(
-        parse_maybe_mul,
-        || 0_i64,
-        |mut acc: i64, item| {
-            if let Some(v) = item {
-                acc += v.val();
-            }
-            acc
-        },
-    )(input)
-}
-
-fn parse_part2_input(input: &str) -> IResult<&str, i64> {
-    fold_many1(
-        parse_maybe_dont_mul,
-        || 0_i64,
-        |mut acc: i64, item| {
-            acc += item;
-            acc
-        },
-    )(input)
-}
-
-fn parse_maybe_mul(input: &str) -> IResult<&str, Option<Inst>> {
-    preceded(
-        take_until("mul"),
-        branch::alt((
-            combinator::map(parse_mul, Some),
-            combinator::map(tag("mul"), |_| None),
-        )),
-    )(input)
-}
-
-fn parse_mul(input: &str) -> IResult<&str, Inst> {
-    let (input, (left, right)) = delimited(
-        tag("mul("),
-        separated_pair(complete::i64, tag(","), complete::i64),
-        tag(")"),
-    )(input)?;
-    Ok((input, Inst { left, right }))
-}
-
-fn parse_dont(input: &str) -> IResult<&str, &str> {
-    branch::alt((take_until("do()"), combinator::rest))(input)
-}
-
-fn parse_maybe_dont_mul(input: &str) -> IResult<&str, i64> {
-    let (input, sub_region) = branch::alt((
-        terminated(take_until("don't()"), parse_dont),
-        combinator::rest,
-    ))(input)?;
-
-    let res = parse_part1_input(sub_region);
-
-    if res.is_err() && sub_region.is_empty() {
-        res
-    } else {
-        let v = res.map(|(_, v)| v).unwrap_or_default();
-
-        Ok((input, v))
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-struct Inst {
-    left: i64,
-    right: i64,
-}
-
-impl Inst {
-    pub fn val(&self) -> i64 {
-        self.left * self.right
     }
 }
 

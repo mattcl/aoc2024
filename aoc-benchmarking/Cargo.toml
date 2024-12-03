@@ -15,3 +15,4 @@ criterion = { version = "0.5.1", features = ["csv_output"] }
 aoc-plumbing = { path = "../aoc-plumbing" }
 historian-hysteria = { path = "../day-001-historian-hysteria" }
 red-nosed-reports = { path = "../day-002-red-nosed-reports" }
+mull-it-over = { path = "../day-003-mull-it-over" }

@@ -21,15 +21,17 @@ impl FromStr for MullItOver {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        // again, easier to solve both during the parsing step
-        let (_, part1) = parse_input(s).map_err(|e| e.to_owned())?;
+        // again, easier to solve both during the parsing step because otherwise
+        // I'd have to own the &str by allocating a String. I still have to make
+        // two passes, though.
+        let (_, part1) = parse_part1_input(s).map_err(|e| e.to_owned())?;
         let (_, part2) = parse_part2_input(s).map_err(|e| e.to_owned())?;
 
         Ok(Self { part1, part2 })
     }
 }
 
-fn parse_input(input: &str) -> IResult<&str, i64> {
+fn parse_part1_input(input: &str) -> IResult<&str, i64> {
     fold_many1(
         parse_maybe_mul,
         || 0_i64,
@@ -82,7 +84,7 @@ fn parse_maybe_dont_mul(input: &str) -> IResult<&str, i64> {
         combinator::rest,
     ))(input)?;
 
-    let res = parse_input(sub_region);
+    let res = parse_part1_input(sub_region);
 
     if res.is_err() && sub_region.is_empty() {
         res

@@ -5,6 +5,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use aoc_plumbing::Problem;
+use ceres_search::CeresSearch;
 use clap::{Args, CommandFactory, Parser, Subcommand};
 use clap_complete::{generate, shells::Zsh};
 use historian_hysteria::HistorianHysteria;
@@ -170,5 +171,6 @@ generate_cli! {
     (HistorianHysteria, 1),
     (RedNosedReports, 2),
     (MullItOver, 3),
+    (CeresSearch, 4),
     // command_marker
 }

@@ -77,6 +77,7 @@ name = "aoc-benchmarking"
 version = "0.1.0"
 dependencies = [
  "aoc-plumbing",
+ "ceres-search",
  "criterion",
  "historian-hysteria",
  "mull-it-over",
@@ -85,10 +86,11 @@ dependencies = [
 
 [[package]]
 name = "aoc-cli"
-version = "0.3.1"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
+ "ceres-search",
  "clap",
  "clap_complete",
  "historian-hysteria",
@@ -99,11 +101,108 @@ dependencies = [
 ]
 
 [[package]]
+name = "aoc-collections"
+version = "0.4.0"
+source = "registry+https://gitea.hl.ancalagon.black/matt/_cargo-index.git"
+checksum = "c56409f9d911952457319d788cc6169a13bd3e90afa5737fed269f5bbc9683b3"
+dependencies = [
+ "aoc-conversions",
+ "aoc-directions",
+ "aoc-geometry",
+ "aoc-types",
+ "indexmap",
+ "nom",
+ "num",
+ "rustc-hash",
+ "thiserror",
+]
+
+[[package]]
+name = "aoc-conversions"
+version = "0.2.0"
+source = "registry+https://gitea.hl.ancalagon.black/matt/_cargo-index.git"
+checksum = "b8ab6fa866a3225de15bb043359032ee4b01de845fad18c11d3a453c7d2dfe4b"
+dependencies = [
+ "thiserror",
+ "xxhash-rust",
+]
+
+[[package]]
+name = "aoc-directions"
+version = "0.2.0"
+source = "registry+https://gitea.hl.ancalagon.black/matt/_cargo-index.git"
+checksum = "4bac34a335230379c33759063511fac3c912abd20076bb1a7fa9923dda43c736"
+dependencies = [
+ "thiserror",
+]
+
+[[package]]
+name = "aoc-geometry"
+version = "0.5.0"
+source = "registry+https://gitea.hl.ancalagon.black/matt/_cargo-index.git"
+checksum = "ab2c0039ad06ef543653d8d769e3ae16aa3bf941a97bbd0b7ab8a67383285cfa"
+dependencies = [
+ "aoc-directions",
+ "num",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "aoc-pathing"
+version = "0.2.0"
+source = "registry+https://gitea.hl.ancalagon.black/matt/_cargo-index.git"
+checksum = "2cca095d94b5aa40ab8d7633c4b2d72d6772f9995805f1b25890872e2f2879bc"
+dependencies = [
+ "aoc-collections",
+ "num",
+ "rustc-hash",
+ "thiserror",
+]
+
+[[package]]
 name = "aoc-plumbing"
 version = "0.1.0"
 dependencies = [
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "aoc-std"
+version = "0.4.0"
+source = "registry+https://gitea.hl.ancalagon.black/matt/_cargo-index.git"
+checksum = "0ee7282f3e8c2a98caf39638938cbd7730bb1bb76885246eab020de44d1dd6bd"
+dependencies = [
+ "aoc-collections",
+ "aoc-conversions",
+ "aoc-directions",
+ "aoc-geometry",
+ "aoc-pathing",
+ "aoc-types",
+ "aoc-vm",
+]
+
+[[package]]
+name = "aoc-types"
+version = "0.2.0"
+source = "registry+https://gitea.hl.ancalagon.black/matt/_cargo-index.git"
+checksum = "abbd0fb4bc455ee0e3221589e980d886c5a43a76562b41e49a6be1fe834153c3"
+dependencies = [
+ "aoc-conversions",
+ "thiserror",
+]
+
+[[package]]
+name = "aoc-vm"
+version = "0.2.0"
+source = "registry+https://gitea.hl.ancalagon.black/matt/_cargo-index.git"
+checksum = "4e1903d80af16c1c711159e04c9dcad48a0e7fe49bad52685b36447c13d06359"
+dependencies = [
+ "aoc-types",
+ "nom",
+ "thiserror",
 ]
 
 [[package]]
@@ -129,6 +228,18 @@ name = "cast"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "37b2a672a2cb129a2e41c10b1224bb368f9f37a2b16b612598138befd7b37eb5"
+
+[[package]]
+name = "ceres-search"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-plumbing",
+ "aoc-std",
+ "nom",
+ "rustc-hash",
+ "serde",
+]
 
 [[package]]
 name = "cfg-if"
@@ -335,6 +446,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "hashbrown"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
+
+[[package]]
 name = "heck"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -355,6 +472,16 @@ dependencies = [
  "nom",
  "rustc-hash",
  "serde",
+]
+
+[[package]]
+name = "indexmap"
+version = "1.9.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bd070e393353796e801d209ad339e89596eb4c8d430d18ede6a1cced8fafbd99"
+dependencies = [
+ "autocfg",
+ "hashbrown",
 ]
 
 [[package]]
@@ -447,6 +574,70 @@ checksum = "d273983c5a657a70a3e8f2a01329822f3b8c8172b73826411a55751e404a0a4a"
 dependencies = [
  "memchr",
  "minimal-lexical",
+]
+
+[[package]]
+name = "num"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "35bd024e8b2ff75562e5f34e7f4905839deb4b22955ef5e73d2fea1b9813cb23"
+dependencies = [
+ "num-bigint",
+ "num-complex",
+ "num-integer",
+ "num-iter",
+ "num-rational",
+ "num-traits",
+]
+
+[[package]]
+name = "num-bigint"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a5e44f723f1133c9deac646763579fdb3ac745e418f2a7af9cd0c431da1f20b9"
+dependencies = [
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
+name = "num-complex"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73f88a1307638156682bada9d7604135552957b7818057dcef22705b4d509495"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
+name = "num-integer"
+version = "0.1.46"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7969661fd2958a5cb096e56c8e1ad0444ac2bbcd0061bd28660485a44879858f"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
+name = "num-iter"
+version = "0.1.45"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1429034a0490724d0075ebb2bc9e875d6503c3cf69e235a8941aa757d83ef5bf"
+dependencies = [
+ "autocfg",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
+name = "num-rational"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f83d14da390562dca69fc84082e73e548e1ad308d24accdedd2720017cb37824"
+dependencies = [
+ "num-bigint",
+ "num-integer",
+ "num-traits",
 ]
 
 [[package]]
@@ -670,6 +861,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "thiserror"
+version = "2.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f49a1853cf82743e3b7950f77e0f4d622ca36cf4317cba00c767838bac8d490"
+dependencies = [
+ "thiserror-impl",
+]
+
+[[package]]
+name = "thiserror-impl"
+version = "2.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8381894bb3efe0c4acac3ded651301ceee58a15d47c2e34885ed1908ad667061"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "tinytemplate"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -856,3 +1067,9 @@ name = "windows_x86_64_msvc"
 version = "0.52.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
+
+[[package]]
+name = "xxhash-rust"
+version = "0.8.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a5cbf750400958819fb6178eaa83bee5cd9c29a26a40cc241df8c70fdd46984"

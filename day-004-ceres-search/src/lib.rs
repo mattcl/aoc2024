@@ -50,14 +50,11 @@ impl CeresSearch {
     fn search_xmas_dir(&self, location: &Location, dir: &Direction) -> bool {
         location
             .project(dir, 2)
-            .and_then(|l| {
-                self.grid
-                    .get(&l)
-                    .filter(|v| **v == 'S')
-                    .and_then(|_| location.project(dir, 1))
-                    .and_then(|l| self.grid.get(&l))
-                    .map(|v| *v == 'A')
-            })
+            .and_then(|l| self.grid.get(&l))
+            .filter(|v| **v == 'S')
+            .and_then(|_| location.project(dir, 1))
+            .and_then(|l| self.grid.get(&l))
+            .map(|v| *v == 'A')
             .unwrap_or_default()
     }
 

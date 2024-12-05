@@ -2,9 +2,7 @@ use std::str::FromStr;
 
 use anyhow::anyhow;
 use aoc_plumbing::Problem;
-use nom::{
-    character::complete, combinator, multi::separated_list1, sequence::separated_pair, IResult,
-};
+use nom::{character::complete, combinator, multi::separated_list1, IResult};
 
 #[derive(Debug, Clone)]
 pub struct PrintQueue {
@@ -22,14 +20,18 @@ impl FromStr for PrintQueue {
             .split_once("\n\n")
             .ok_or_else(|| anyhow!("invalid input"))?;
 
-        let (_, raw_rules) = parse_rules(rules).map_err(|e| e.to_owned())?;
-
         let mut rules_left = [0; 100];
         let mut rules_right = [0; 100];
 
-        for rule in raw_rules {
-            rules_left[rule.left as usize] |= 1 << rule.right;
-            rules_right[rule.right as usize] |= 1 << rule.left;
+        for raw_rule in rules.lines() {
+            let (left_raw, right_raw) = raw_rule
+                .split_once('|')
+                .ok_or_else(|| anyhow!("invalid input"))?;
+            let left: u8 = left_raw.parse()?;
+            let right: u8 = right_raw.parse()?;
+
+            rules_left[left as usize] |= 1 << right;
+            rules_right[right as usize] |= 1 << left;
         }
 
         let (_, updates) = parse_updates(update_str).map_err(|e| e.to_owned())?;
@@ -40,23 +42,6 @@ impl FromStr for PrintQueue {
             updates,
         })
     }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-struct Rule {
-    left: u8,
-    right: u8,
-}
-
-fn parse_rules(input: &str) -> IResult<&str, Vec<Rule>> {
-    separated_list1(complete::newline, parse_rule)(input)
-}
-
-fn parse_rule(input: &str) -> IResult<&str, Rule> {
-    combinator::map(
-        separated_pair(complete::u8, complete::char('|'), complete::u8),
-        |(left, right)| Rule { left, right },
-    )(input)
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -91,25 +76,24 @@ impl Update {
     // the middle number _would_ be
     pub fn middle_reorder(&self, rules_left: &[u128], rules_right: &[u128]) -> u8 {
         let each_side = (self.pages.len() / 2) as u32;
-        for page in self.pages.iter().copied() {
-            let mut seen = 0_u128;
-            for other in self.pages.iter().copied() {
-                if other == page {
-                    continue;
-                }
 
-                seen |= 1_u128 << other;
-            }
+        let mut seen = 0_u128;
+        for page in self.pages.iter().copied() {
+            seen |= 1_u128 << page;
+        }
+
+        for page in self.pages.iter().copied() {
+            let cur = seen & !(1_u128 << page);
 
             let rule = rules_left[page as usize];
 
-            if rule == 0 || (seen & rule).count_ones() != each_side {
+            if rule == 0 || (cur & rule).count_ones() != each_side {
                 continue;
             }
 
             let rule = rules_right[page as usize];
 
-            if rule == 0 || (seen & rule).count_ones() != each_side {
+            if rule == 0 || (cur & rule).count_ones() != each_side {
                 continue;
             }
 

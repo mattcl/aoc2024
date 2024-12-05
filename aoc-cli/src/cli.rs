@@ -10,6 +10,7 @@ use clap::{Args, CommandFactory, Parser, Subcommand};
 use clap_complete::{generate, shells::Zsh};
 use historian_hysteria::HistorianHysteria;
 use mull_it_over::MullItOver;
+use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
 // import_marker
 
@@ -172,5 +173,6 @@ generate_cli! {
     (RedNosedReports, 2),
     (MullItOver, 3),
     (CeresSearch, 4),
+    (PrintQueue, 5),
     // command_marker
 }

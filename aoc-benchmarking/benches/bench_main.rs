@@ -4,6 +4,7 @@ use aoc_benchmarking::aoc_benches;
 use ceres_search::CeresSearch;
 use historian_hysteria::HistorianHysteria;
 use mull_it_over::MullItOver;
+use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
 // import_marker
 
@@ -35,6 +36,13 @@ aoc_benches! {
         day_004,
         "../day-004-ceres-search/input.txt",
         CeresSearch,
+        "Part 1",
+        "Part 2"
+    ),
+    (
+        day_005,
+        "../day-005-print-queue/input.txt",
+        PrintQueue,
         "Part 1",
         "Part 2"
     ),

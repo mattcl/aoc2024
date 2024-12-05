@@ -15,8 +15,8 @@ impl FromStr for CeresSearch {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut raw = vec![vec!['.'; 140]; 140];
-        let mut x_pos = Vec::default();
-        let mut a_pos = Vec::default();
+        let mut x_pos = Vec::with_capacity(5000);
+        let mut a_pos = Vec::with_capacity(5000);
 
         for (r, line) in s.trim().lines().enumerate() {
             for (c, v) in line.chars().enumerate() {

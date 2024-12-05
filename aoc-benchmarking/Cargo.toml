@@ -17,3 +17,4 @@ historian-hysteria = { path = "../day-001-historian-hysteria" }
 red-nosed-reports = { path = "../day-002-red-nosed-reports" }
 mull-it-over = { path = "../day-003-mull-it-over" }
 ceres-search = { path = "../day-004-ceres-search" }
+print-queue = { path = "../day-005-print-queue" }

@@ -46,6 +46,7 @@ impl FromStr for MullItOver {
                 // left
                 start += 4;
                 let mut cur = start;
+                let mut left = 0;
                 loop {
                     if bytes[cur] == b',' {
                         break;
@@ -56,6 +57,8 @@ impl FromStr for MullItOver {
                         continue 'outer;
                     }
 
+                    left = left * 10 + (bytes[cur] - b'0') as i64;
+
                     cur += 1;
                 }
                 if start == cur {
@@ -63,11 +66,10 @@ impl FromStr for MullItOver {
                     continue;
                 }
 
-                let left: i64 = s[start..cur].parse()?;
-
                 // right
                 start = cur + 1;
                 cur = start;
+                let mut right = 0;
                 loop {
                     if bytes[cur] == b')' {
                         break;
@@ -78,13 +80,13 @@ impl FromStr for MullItOver {
                         continue 'outer;
                     }
 
+                    right = right * 10 + (bytes[cur] - b'0') as i64;
                     cur += 1;
                 }
                 if start == cur {
                     start += 1;
                     continue;
                 }
-                let right: i64 = s[start..cur].parse()?;
 
                 let prod = left * right;
                 part1 += prod;

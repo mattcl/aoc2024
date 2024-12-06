@@ -2,19 +2,20 @@
 
 As usual, no-unsafe, performance-oriented Solutions.
 
-## Current runtime ~0.487 ms
+## Current runtime ~1.282 ms
 
 ```
 ❯ aoc-tools criterion-summary target/criterion
 +---------------------------------------------------+
 | Problem                  Time (ms)   % Total Time |
 +===================================================+
-| 001 historian hysteria     0.03368          6.915 |
-| 002 red nosed reports      0.09398         19.293 |
-| 003 mull it over           0.01565          3.214 |
-| 004 ceres search           0.29693         60.957 |
-| 005 print queue            0.04687          9.621 |
-| Total                      0.48711        100.000 |
+| 001 historian hysteria     0.03655          2.850 |
+| 002 red nosed reports      0.09264          7.223 |
+| 003 mull it over           0.01536          1.197 |
+| 004 ceres search           0.30712         23.948 |
+| 005 print queue            0.04655          3.630 |
+| 006 guard gallivant        0.78424         61.151 |
+| Total                      1.28246        100.000 |
 +---------------------------------------------------+
 ```
 

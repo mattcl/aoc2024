@@ -179,11 +179,13 @@ struct Guard {
     facing: Cardinal,
 }
 
-// sigh, the whole 130x130 grid is a PITA
+/// Sigh, the whole 130x130 grid is a PITA. It might be better to make this
+/// align better, but I can't be bothered to do the math with more than two
+/// values.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct WideMap {
     left: u128,
-    right: u128,
+    right: u8,
 }
 
 impl WideMap {
@@ -206,13 +208,13 @@ impl WideMap {
                 }
             }
             let right_offset = self.right.trailing_zeros() as usize;
-            if right_offset != 128 {
+            if right_offset != 8 {
                 return Some(127 + right_offset);
             }
         } else {
             let shifted = self.right >> (idx - 128 + 1);
             let offset = shifted.trailing_zeros() as usize;
-            if offset != 128 {
+            if offset != 8 {
                 return Some(idx + offset);
             }
         }
@@ -230,9 +232,9 @@ impl WideMap {
             }
         } else {
             if idx > 128 {
-                let shifted = self.right << (128 - (idx - 128));
+                let shifted = self.right << (8 - (idx - 128));
                 let offset = shifted.leading_zeros() as usize;
-                if offset != 128 {
+                if offset != 8 {
                     return Some(idx - offset);
                 }
             }

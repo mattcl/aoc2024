@@ -8,6 +8,7 @@ use aoc_plumbing::Problem;
 use ceres_search::CeresSearch;
 use clap::{Args, CommandFactory, Parser, Subcommand};
 use clap_complete::{generate, shells::Zsh};
+use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
 use mull_it_over::MullItOver;
 use print_queue::PrintQueue;
@@ -174,5 +175,6 @@ generate_cli! {
     (MullItOver, 3),
     (CeresSearch, 4),
     (PrintQueue, 5),
+    (GuardGallivant, 6),
     // command_marker
 }

@@ -2,6 +2,7 @@ use criterion::criterion_main;
 
 use aoc_benchmarking::aoc_benches;
 use ceres_search::CeresSearch;
+use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
 use mull_it_over::MullItOver;
 use print_queue::PrintQueue;
@@ -45,6 +46,12 @@ aoc_benches! {
         PrintQueue,
         "Part 1",
         "Part 2"
+    ),
+    (
+        day_006,
+        "../day-006-guard-gallivant/input.txt",
+        GuardGallivant,
+        "Combined"
     ),
     // bench_marker
 }

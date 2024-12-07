@@ -70,7 +70,6 @@ impl GuardGallivant {
                     }
 
                     if let Some(next_col) = row_map.next_right(guard.location.col) {
-                        guard.facing = guard.facing.right();
                         guard.location.col = next_col;
                     } else {
                         return false;
@@ -83,7 +82,6 @@ impl GuardGallivant {
                     }
 
                     if let Some(next_col) = row_map.next_left(guard.location.col) {
-                        guard.facing = guard.facing.right();
                         guard.location.col = next_col;
                     } else {
                         return false;
@@ -96,7 +94,6 @@ impl GuardGallivant {
                     }
 
                     if let Some(next_row) = col_map.next_right(guard.location.row) {
-                        guard.facing = guard.facing.right();
                         guard.location.row = next_row;
                     } else {
                         return false;
@@ -109,13 +106,14 @@ impl GuardGallivant {
                     }
 
                     if let Some(next_row) = col_map.next_left(guard.location.row) {
-                        guard.facing = guard.facing.right();
                         guard.location.row = next_row;
                     } else {
                         return false;
                     }
                 }
             }
+
+            guard.facing = guard.facing.right();
 
             if seen.contains(&guard) {
                 return true;
@@ -202,19 +200,19 @@ impl WideMap {
         if idx < 128 {
             if idx < 127 {
                 let shifted = self.left >> (idx + 1);
-                let offset = shifted.trailing_zeros() as usize;
-                if offset != 128 {
+                if shifted > 0 {
+                    let offset = shifted.trailing_zeros() as usize;
                     return Some(idx + offset);
                 }
             }
-            let right_offset = self.right.trailing_zeros() as usize;
-            if right_offset != 8 {
+            if self.right > 0 {
+                let right_offset = self.right.trailing_zeros() as usize;
                 return Some(127 + right_offset);
             }
         } else {
             let shifted = self.right >> (idx - 128 + 1);
-            let offset = shifted.trailing_zeros() as usize;
-            if offset != 8 {
+            if shifted > 0 {
+                let offset = shifted.trailing_zeros() as usize;
                 return Some(idx + offset);
             }
         }
@@ -225,21 +223,24 @@ impl WideMap {
     /// get the next open space prior to an obstacle to our left, if one exists
     pub fn next_left(&self, idx: usize) -> Option<usize> {
         if idx < 128 {
+            if idx == 0 {
+                return None;
+            }
             let shifted = self.left << (128 - idx);
-            let offset = shifted.leading_zeros() as usize;
-            if offset != 128 {
+            if shifted > 0 {
+                let offset = shifted.leading_zeros() as usize;
                 return Some(idx - offset);
             }
         } else {
             if idx > 128 {
                 let shifted = self.right << (8 - (idx - 128));
-                let offset = shifted.leading_zeros() as usize;
-                if offset != 8 {
+                if shifted > 0 {
+                    let offset = shifted.leading_zeros() as usize;
                     return Some(idx - offset);
                 }
             }
-            let left_offset = self.left.leading_zeros() as usize;
-            if left_offset != 128 {
+            if self.left > 0 {
+                let left_offset = self.left.leading_zeros() as usize;
                 return Some(128 - left_offset);
             }
         }

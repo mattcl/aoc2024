@@ -5,6 +5,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use aoc_plumbing::Problem;
+use bridge_repair::BridgeRepair;
 use ceres_search::CeresSearch;
 use clap::{Args, CommandFactory, Parser, Subcommand};
 use clap_complete::{generate, shells::Zsh};
@@ -176,5 +177,6 @@ generate_cli! {
     (CeresSearch, 4),
     (PrintQueue, 5),
     (GuardGallivant, 6),
+    (BridgeRepair, 7),
     // command_marker
 }

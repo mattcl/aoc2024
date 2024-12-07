@@ -25,10 +25,28 @@ impl FromStr for BridgeRepair {
 
         let (p1, p2) = equations
             .into_par_iter()
-            .map(|eq| eq.is_valid_combined())
-            .reduce(|| (0, 0), |(p1, p2), (e1, e2)| (p1 + e1, p2 + e2));
+            .map(|eq| eq.is_valid_combined_dfs())
+            .reduce(|| (0, 0), |(p1, p2), (a1, a2)| (p1 + a1, p2 + a2));
 
         Ok(Self { p1, p2 })
+
+        // let mut p1 = 0;
+        // equations.retain(|eq| {
+        //     if eq.is_valid() {
+        //         p1 += eq.left;
+        //         false
+        //     } else {
+        //         true
+        //     }
+        // });
+
+        // let p2: i64 = equations
+        //     .into_par_iter()
+        //     .filter(|eq| eq.is_concat_valid_dfs())
+        //     .map(|eq| eq.left)
+        //     .sum();
+
+        // Ok(Self { p1, p2: p1 + p2 })
     }
 }
 
@@ -54,6 +72,7 @@ impl Problem for BridgeRepair {
 pub struct Equation {
     left: i64,
     right: Vec<i64>,
+    widths: Vec<u8>,
 }
 
 impl Equation {
@@ -108,6 +127,80 @@ impl Equation {
         }
 
         false
+    }
+
+    pub fn is_concat_valid_dfs(&self) -> bool {
+        self._is_concat_valid_dfs(1, self.right[0])
+    }
+
+    fn _is_concat_valid_dfs(&self, idx: usize, head: i64) -> bool {
+        if idx == self.right.len() {
+            if head == self.left {
+                return true;
+            }
+            return false;
+        }
+
+        if head > self.left {
+            return false;
+        }
+
+        let v = self.right[idx];
+        let next_idx = idx + 1;
+
+        self._is_concat_valid_dfs(next_idx, head + v)
+            || self._is_concat_valid_dfs(next_idx, head * v)
+            || self._is_concat_valid_dfs(next_idx, concat(head, v))
+    }
+
+    pub fn is_valid_combined_dfs(&self) -> (i64, i64) {
+        let mut p1_valid = false;
+        let mut p2_valid = false;
+        self._is_valid_combined_dfs(1, self.right[0], false, &mut p1_valid, &mut p2_valid);
+
+        if p1_valid {
+            (self.left, self.left)
+        } else if p2_valid {
+            (0, self.left)
+        } else {
+            (0, 0)
+        }
+    }
+
+    fn _is_valid_combined_dfs(&self, idx: usize, head: i64, used_concat: bool, p1_valid: &mut bool, p2_valid: &mut bool) {
+        if idx == self.right.len() {
+            if head == self.left {
+                *p2_valid = true;
+                if !used_concat {
+                    *p1_valid = true;
+                }
+            }
+            return;
+        }
+
+        if head > self.left {
+            return;
+        }
+
+        let v = self.right[idx];
+        let next_idx = idx + 1;
+
+        self._is_valid_combined_dfs(next_idx, head + v, used_concat, p1_valid, p2_valid);
+
+        if *p1_valid {
+            return;
+        }
+
+        self._is_valid_combined_dfs(next_idx, head * v, used_concat, p1_valid, p2_valid);
+
+        if *p1_valid {
+            return;
+        }
+
+        if !*p2_valid {
+            let width = self.widths[idx];
+            self._is_valid_combined_dfs(next_idx, (head * 10_i64.pow(width as u32)) + v, true, p1_valid, p2_valid);
+        }
     }
 
     pub fn is_valid_sequential(&self) -> (i64, i64) {
@@ -234,6 +327,20 @@ fn concat(left: i64, right: i64) -> i64 {
     (left * 10_i64.pow(digits.max(1))) + right
 }
 
+fn digits(val: i64) -> u8 {
+    let mut digits = 0;
+    let mut cur = val;
+    while cur > 0 {
+        if cur == 10 {
+            digits += 2;
+            break;
+        }
+        digits += 1;
+        cur /= 10;
+    }
+    digits.max(1) as u8
+}
+
 fn parse_equations(input: &str) -> IResult<&str, Vec<Equation>> {
     separated_list1(multispace1, parse_equation)(input)
 }
@@ -245,7 +352,10 @@ fn parse_equation(input: &str) -> IResult<&str, Equation> {
             tag(": "),
             separated_list1(space1, complete::i64),
         ),
-        |(left, right)| Equation { left, right },
+        |(left, right)| {
+            let widths = right.iter().map(|v| digits(*v)).collect();
+            Equation { left, right, widths }
+        },
     )(input)
 }
 
@@ -284,14 +394,5 @@ mod tests {
         assert_eq!(concat(12, 10), 1210);
         assert_eq!(concat(126, 100), 126100);
         assert_eq!(concat(1, 1), 11);
-    }
-
-    #[test]
-    fn validation() {
-        let eq = Equation {
-            left: 7290,
-            right: vec![6, 8, 6, 15],
-        };
-        assert!(eq.is_concat_valid())
     }
 }

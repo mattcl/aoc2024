@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{str::FromStr, u8};
 
 use aoc_plumbing::Problem;
 use aoc_std::{
@@ -13,9 +13,8 @@ use rustc_hash::{FxHashMap, FxHashSet};
 pub struct GuardGallivant {
     guard: Guard,
     grid: Grid<char>,
-    obstacles_rows: Vec<WideMap>,
-    obstacles_cols: Vec<WideMap>,
     candidate_states: FxHashMap<Guard, Location>,
+    jumps: Vec<Vec<Jumps>>,
 }
 
 impl FromStr for GuardGallivant {
@@ -44,12 +43,36 @@ impl FromStr for GuardGallivant {
             }
         }
 
+        let mut jumps = vec![vec![Jumps::default(); grid.width()]; grid.height()];
+
+        #[allow(clippy::needless_range_loop)]
+        for r in 0..grid.height() {
+            for c in 0..grid.width() {
+                if grid.locations[r][c] != '#' {
+                    if let Some(next) = obstacles_rows[r].next_right(c) {
+                        jumps[r][c].east = next as u8;
+                    }
+
+                    if let Some(next) = obstacles_rows[r].next_left(c) {
+                        jumps[r][c].west = next as u8;
+                    }
+
+                    if let Some(next) = obstacles_cols[c].next_right(r) {
+                        jumps[r][c].south = next as u8;
+                    }
+
+                    if let Some(next) = obstacles_cols[c].next_left(r) {
+                        jumps[r][c].north = next as u8;
+                    }
+                }
+            }
+        }
+
         Ok(Self {
             guard,
             grid,
-            obstacles_rows,
-            obstacles_cols,
             candidate_states: FxHashMap::default(),
+            jumps,
         })
     }
 }
@@ -60,62 +83,60 @@ impl GuardGallivant {
         let mut seen = FxHashSet::default();
         seen.insert(guard);
         loop {
+            let jumps = self.jumps[guard.location.row][guard.location.col];
             // given our current position and heading, get the next obstacle
             // ahead of us
             match guard.facing {
                 Cardinal::North => {
-                    let mut row_map = self.obstacles_rows[guard.location.row];
-                    if obstruction.row == guard.location.row {
-                        row_map.insert(obstruction.col);
-                    }
-
-                    if let Some(next_col) = row_map.next_right(guard.location.col) {
-                        guard.facing = guard.facing.right();
-                        guard.location.col = next_col;
+                    if obstruction.row == guard.location.row && obstruction.col > guard.location.col
+                    {
+                        guard.location.col = (jumps.east as usize).min(obstruction.col - 1);
+                    } else if jumps.east != u8::MAX {
+                        guard.location.col = jumps.east as usize;
                     } else {
                         return false;
                     }
                 }
                 Cardinal::South => {
-                    let mut row_map = self.obstacles_rows[guard.location.row];
-                    if obstruction.row == guard.location.row {
-                        row_map.insert(obstruction.col);
-                    }
-
-                    if let Some(next_col) = row_map.next_left(guard.location.col) {
-                        guard.facing = guard.facing.right();
-                        guard.location.col = next_col;
+                    if obstruction.row == guard.location.row && obstruction.col < guard.location.col
+                    {
+                        guard.location.col = if jumps.west == u8::MAX {
+                            obstruction.col + 1
+                        } else {
+                            (jumps.west as usize).max(obstruction.col + 1)
+                        };
+                    } else if jumps.west != u8::MAX {
+                        guard.location.col = jumps.west as usize;
                     } else {
                         return false;
                     }
                 }
                 Cardinal::East => {
-                    let mut col_map = self.obstacles_cols[guard.location.col];
-                    if obstruction.col == guard.location.col {
-                        col_map.insert(obstruction.row);
-                    }
-
-                    if let Some(next_row) = col_map.next_right(guard.location.row) {
-                        guard.facing = guard.facing.right();
-                        guard.location.row = next_row;
+                    if obstruction.col == guard.location.col && obstruction.row > guard.location.row
+                    {
+                        guard.location.row = (jumps.south as usize).min(obstruction.row - 1);
+                    } else if jumps.south != u8::MAX {
+                        guard.location.row = jumps.south as usize;
                     } else {
                         return false;
                     }
                 }
                 Cardinal::West => {
-                    let mut col_map = self.obstacles_cols[guard.location.col];
-                    if obstruction.col == guard.location.col {
-                        col_map.insert(obstruction.row);
-                    }
-
-                    if let Some(next_row) = col_map.next_left(guard.location.row) {
-                        guard.facing = guard.facing.right();
-                        guard.location.row = next_row;
+                    if obstruction.col == guard.location.col && obstruction.row < guard.location.row
+                    {
+                        guard.location.row = if jumps.north == u8::MAX {
+                            obstruction.row + 1
+                        } else {
+                            (jumps.north as usize).max(obstruction.row + 1)
+                        };
+                    } else if jumps.north != u8::MAX {
+                        guard.location.row = jumps.north as usize;
                     } else {
                         return false;
                     }
                 }
             }
+            guard.facing = guard.facing.right();
 
             if seen.contains(&guard) {
                 return true;
@@ -225,6 +246,9 @@ impl WideMap {
     /// get the next open space prior to an obstacle to our left, if one exists
     pub fn next_left(&self, idx: usize) -> Option<usize> {
         if idx < 128 {
+            if idx == 0 {
+                return None;
+            }
             let shifted = self.left << (128 - idx);
             let offset = shifted.leading_zeros() as usize;
             if offset != 128 {
@@ -245,6 +269,25 @@ impl WideMap {
         }
 
         None
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Jumps {
+    north: u8,
+    south: u8,
+    east: u8,
+    west: u8,
+}
+
+impl Default for Jumps {
+    fn default() -> Self {
+        Self {
+            north: u8::MAX,
+            south: u8::MAX,
+            east: u8::MAX,
+            west: u8::MAX,
+        }
     }
 }
 

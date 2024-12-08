@@ -4,11 +4,11 @@ use aoc_plumbing::Problem;
 use aoc_std::geometry::Point2D;
 use itertools::Itertools;
 use num::integer::gcd;
-use rustc_hash::{FxHashMap, FxHashSet};
+use rustc_hash::FxHashMap;
 
 #[derive(Debug, Clone)]
 pub struct ResonantCollinearity {
-    antennas: FxHashMap<u8, FxHashSet<Point2D<i8>>>,
+    antennas: FxHashMap<u8, Vec<Point2D<i8>>>,
     size: i8,
 }
 
@@ -16,7 +16,7 @@ impl FromStr for ResonantCollinearity {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut antennas: FxHashMap<u8, FxHashSet<Point2D<i8>>> = FxHashMap::default();
+        let mut antennas: FxHashMap<u8, Vec<Point2D<i8>>> = FxHashMap::default();
 
         let mut size = 0;
         for (r, line) in s.trim().lines().enumerate() {
@@ -25,11 +25,11 @@ impl FromStr for ResonantCollinearity {
                 if ch != '.' {
                     match antennas.entry(ch as u8) {
                         Entry::Occupied(mut occupied_entry) => {
-                            occupied_entry.get_mut().insert((c as i8, r as i8).into());
+                            occupied_entry.get_mut().push((c as i8, r as i8).into());
                         }
                         Entry::Vacant(vacant_entry) => {
-                            let s = vacant_entry.insert(FxHashSet::default());
-                            s.insert((c as i8, r as i8).into());
+                            let s = vacant_entry.insert(Vec::default());
+                            s.push((c as i8, r as i8).into());
                         }
                     }
                 }
@@ -42,20 +42,16 @@ impl FromStr for ResonantCollinearity {
 
 impl ResonantCollinearity {
     pub fn compute_antinodes(&self) -> usize {
-        let mut antinodes = FxHashSet::default();
+        let mut antinodes = AntinodeGrid::default();
 
         for antennas in self.antennas.values() {
             self.compute_antinodes_for(antennas, &mut antinodes);
         }
 
-        antinodes.len()
+        antinodes.count()
     }
 
-    fn compute_antinodes_for(
-        &self,
-        antennas: &FxHashSet<Point2D<i8>>,
-        antinodes: &mut FxHashSet<Point2D<i8>>,
-    ) {
+    fn compute_antinodes_for(&self, antennas: &[Point2D<i8>], antinodes: &mut AntinodeGrid) {
         for (a, b) in antennas.iter().tuple_combinations() {
             let left = a.min(b);
             let right = a.max(b);
@@ -69,7 +65,7 @@ impl ResonantCollinearity {
                 && candidate1.y >= 0
                 && candidate1.y < self.size
             {
-                antinodes.insert(candidate1);
+                antinodes.insert(&candidate1);
             }
 
             if candidate2.x >= 0
@@ -77,31 +73,29 @@ impl ResonantCollinearity {
                 && candidate2.y >= 0
                 && candidate2.y < self.size
             {
-                antinodes.insert(candidate2);
+                antinodes.insert(&candidate2);
             }
         }
     }
 
     pub fn compute_line_antinodes(&self) -> usize {
-        let mut antinodes = FxHashSet::default();
+        let mut antinodes = AntinodeGrid::default();
 
         for antennas in self.antennas.values() {
             self.compute_line_antinodes_for(antennas, &mut antinodes);
         }
 
-        antinodes.len()
+        antinodes.count()
     }
 
-    fn compute_line_antinodes_for(
-        &self,
-        antennas: &FxHashSet<Point2D<i8>>,
-        antinodes: &mut FxHashSet<Point2D<i8>>,
-    ) {
+    fn compute_line_antinodes_for(&self, antennas: &[Point2D<i8>], antinodes: &mut AntinodeGrid) {
         for (a, b) in antennas.iter().tuple_combinations() {
             let left = a.min(b);
             let right = a.max(b);
             let mut slope = Point2D::new(right.x - left.x, right.y - left.y);
 
+            // So this never gets triggered in a real input, but it must be a
+            // general possibility
             loop {
                 let d = gcd(slope.x, slope.y);
 
@@ -113,10 +107,12 @@ impl ResonantCollinearity {
                 slope.y /= d;
             }
 
+            // unlike for part 1, we branch off from a single node, and walk to
+            // the edges of the grid.
             let mut candidate1 = left - slope;
             let mut candidate2 = left + slope;
 
-            antinodes.insert(*left);
+            antinodes.insert(left);
 
             loop {
                 if candidate1.x >= 0
@@ -124,7 +120,7 @@ impl ResonantCollinearity {
                     && candidate1.y >= 0
                     && candidate1.y < self.size
                 {
-                    antinodes.insert(candidate1);
+                    antinodes.insert(&candidate1);
                 } else {
                     break;
                 }
@@ -138,7 +134,7 @@ impl ResonantCollinearity {
                     && candidate2.y >= 0
                     && candidate2.y < self.size
                 {
-                    antinodes.insert(candidate2);
+                    antinodes.insert(&candidate2);
                 } else {
                     break;
                 }
@@ -166,16 +162,25 @@ impl Problem for ResonantCollinearity {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct AntennaGrid {
-    frequency: u8,
-    rows: Vec<u64>,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AntinodeGrid {
+    grid: [u64; 50],
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Antenna {
-    point: Point2D<i64>,
-    frequency: u8,
+impl Default for AntinodeGrid {
+    fn default() -> Self {
+        Self { grid: [0; 50] }
+    }
+}
+
+impl AntinodeGrid {
+    pub fn insert(&mut self, point: &Point2D<i8>) {
+        self.grid[point.y as usize] |= 1 << point.x as usize;
+    }
+
+    pub fn count(&self) -> usize {
+        self.grid.iter().map(|r| r.count_ones()).sum::<u32>() as usize
+    }
 }
 
 #[cfg(test)]

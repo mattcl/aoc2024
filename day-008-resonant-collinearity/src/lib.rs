@@ -55,7 +55,7 @@ impl ResonantCollinearity {
         for (a, b) in antennas.iter().tuple_combinations() {
             let left = a.min(b);
             let right = a.max(b);
-            let slope = Point2D::new(right.x - left.x, right.y - left.y);
+            let slope = right - left;
 
             let candidate1 = left - slope;
             let candidate2 = right + slope;
@@ -92,7 +92,7 @@ impl ResonantCollinearity {
         for (a, b) in antennas.iter().tuple_combinations() {
             let left = a.min(b);
             let right = a.max(b);
-            let mut slope = Point2D::new(right.x - left.x, right.y - left.y);
+            let mut slope = right - left;
 
             // So this never gets triggered in a real input, but it must be a
             // general possibility

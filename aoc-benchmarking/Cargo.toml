@@ -20,3 +20,4 @@ ceres-search = { path = "../day-004-ceres-search" }
 print-queue = { path = "../day-005-print-queue" }
 guard-gallivant = { path = "../day-006-guard-gallivant" }
 bridge-repair = { path = "../day-007-bridge-repair" }
+resonant-collinearity = { path = "../day-008-resonant-collinearity" }

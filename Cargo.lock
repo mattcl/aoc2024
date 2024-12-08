@@ -85,11 +85,12 @@ dependencies = [
  "mull-it-over",
  "print-queue",
  "red-nosed-reports",
+ "resonant-collinearity",
 ]
 
 [[package]]
 name = "aoc-cli"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
@@ -102,6 +103,7 @@ dependencies = [
  "mull-it-over",
  "print-queue",
  "red-nosed-reports",
+ "resonant-collinearity",
  "serde",
  "serde_json",
 ]
@@ -362,7 +364,7 @@ dependencies = [
  "criterion-plot",
  "csv",
  "is-terminal",
- "itertools",
+ "itertools 0.10.5",
  "num-traits",
  "once_cell",
  "oorandom",
@@ -383,7 +385,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b50826342786a51a89e2da3a28f1c32b06e387201bc2d19791f622c673706b1"
 dependencies = [
  "cast",
- "itertools",
+ "itertools 0.10.5",
 ]
 
 [[package]]
@@ -538,6 +540,15 @@ name = "itertools"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
 dependencies = [
  "either",
 ]
@@ -810,6 +821,21 @@ name = "regex-syntax"
 version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
+
+[[package]]
+name = "resonant-collinearity"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-plumbing",
+ "aoc-std",
+ "itertools 0.13.0",
+ "nom",
+ "num",
+ "rayon",
+ "rustc-hash",
+ "serde",
+]
 
 [[package]]
 name = "rustc-hash"

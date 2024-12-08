@@ -8,6 +8,7 @@ use historian_hysteria::HistorianHysteria;
 use mull_it_over::MullItOver;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
+use resonant_collinearity::ResonantCollinearity;
 // import_marker
 
 criterion_main! {
@@ -59,6 +60,13 @@ aoc_benches! {
         "../day-007-bridge-repair/input.txt",
         BridgeRepair,
         "Combined"
+    ),
+    (
+        day_008,
+        "../day-008-resonant-collinearity/input.txt",
+        ResonantCollinearity,
+        "Part 1",
+        "Part 2"
     ),
     // bench_marker
 }

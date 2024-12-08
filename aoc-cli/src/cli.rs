@@ -14,6 +14,7 @@ use historian_hysteria::HistorianHysteria;
 use mull_it_over::MullItOver;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
+use resonant_collinearity::ResonantCollinearity;
 // import_marker
 
 // I'm not proud
@@ -178,5 +179,6 @@ generate_cli! {
     (PrintQueue, 5),
     (GuardGallivant, 6),
     (BridgeRepair, 7),
+    (ResonantCollinearity, 8),
     // command_marker
 }

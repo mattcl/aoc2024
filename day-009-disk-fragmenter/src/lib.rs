@@ -76,9 +76,7 @@ impl Problem for DiskFragmenter {
 
                 // do this here instead of with the file funciton since we might
                 // not take all the blocks
-                for i in 0..taken {
-                    checksum += rear.id * (pos + i);
-                }
+                checksum += rear.id * (pos + pos + taken - 1) * taken / 2;
 
                 pos += taken;
                 free -= taken;
@@ -171,7 +169,7 @@ impl AocFile {
     }
 
     pub fn checksum(&self, pos: usize) -> usize {
-        (0..self.size).map(|i| self.id * (pos + i)).sum()
+        self.id * (pos + pos + self.size - 1) * self.size / 2
     }
 }
 

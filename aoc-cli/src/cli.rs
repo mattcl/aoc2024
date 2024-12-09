@@ -9,6 +9,7 @@ use bridge_repair::BridgeRepair;
 use ceres_search::CeresSearch;
 use clap::{Args, CommandFactory, Parser, Subcommand};
 use clap_complete::{generate, shells::Zsh};
+use disk_fragmenter::DiskFragmenter;
 use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
 use mull_it_over::MullItOver;
@@ -180,5 +181,6 @@ generate_cli! {
     (GuardGallivant, 6),
     (BridgeRepair, 7),
     (ResonantCollinearity, 8),
+    (DiskFragmenter, 9),
     // command_marker
 }

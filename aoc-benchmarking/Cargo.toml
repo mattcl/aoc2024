@@ -21,3 +21,4 @@ print-queue = { path = "../day-005-print-queue" }
 guard-gallivant = { path = "../day-006-guard-gallivant" }
 bridge-repair = { path = "../day-007-bridge-repair" }
 resonant-collinearity = { path = "../day-008-resonant-collinearity" }
+disk-fragmenter = { path = "../day-009-disk-fragmenter" }

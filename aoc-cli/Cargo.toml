@@ -1,6 +1,6 @@
 [package]
 name = "aoc-cli"
-version = "0.8.1"
+version = "0.9.0"
 authors = ["Matt Chun-Lum <matt@questionable.engineering>"]
 edition = "2021"
 description = "A command line interface for executing Advent of Code solutions."
@@ -24,3 +24,4 @@ print-queue = { path = "../day-005-print-queue" }
 guard-gallivant = { path = "../day-006-guard-gallivant" }
 bridge-repair = { path = "../day-007-bridge-repair" }
 resonant-collinearity = { path = "../day-008-resonant-collinearity" }
+disk-fragmenter = { path = "../day-009-disk-fragmenter" }

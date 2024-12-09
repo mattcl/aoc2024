@@ -80,6 +80,7 @@ dependencies = [
  "bridge-repair",
  "ceres-search",
  "criterion",
+ "disk-fragmenter",
  "guard-gallivant",
  "historian-hysteria",
  "mull-it-over",
@@ -90,7 +91,7 @@ dependencies = [
 
 [[package]]
 name = "aoc-cli"
-version = "0.8.1"
+version = "0.9.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
@@ -98,6 +99,7 @@ dependencies = [
  "ceres-search",
  "clap",
  "clap_complete",
+ "disk-fragmenter",
  "guard-gallivant",
  "historian-hysteria",
  "mull-it-over",
@@ -438,6 +440,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5efa2b3d7902f4b634a20cae3c9c4e6209dc4779feb6863329607560143efa70"
 dependencies = [
  "memchr",
+]
+
+[[package]]
+name = "disk-fragmenter"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-plumbing",
+ "aoc-std",
+ "nom",
+ "rustc-hash",
+ "serde",
 ]
 
 [[package]]

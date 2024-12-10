@@ -12,6 +12,7 @@ use clap_complete::{generate, shells::Zsh};
 use disk_fragmenter::DiskFragmenter;
 use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
+use hoof_it::HoofIt;
 use mull_it_over::MullItOver;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
@@ -182,5 +183,6 @@ generate_cli! {
     (BridgeRepair, 7),
     (ResonantCollinearity, 8),
     (DiskFragmenter, 9),
+    (HoofIt, 10),
     // command_marker
 }

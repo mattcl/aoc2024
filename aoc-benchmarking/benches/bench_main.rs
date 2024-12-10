@@ -6,6 +6,7 @@ use ceres_search::CeresSearch;
 use disk_fragmenter::DiskFragmenter;
 use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
+use hoof_it::HoofIt;
 use mull_it_over::MullItOver;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
@@ -73,6 +74,12 @@ aoc_benches! {
         day_009,
         "../day-009-disk-fragmenter/input.txt",
         DiskFragmenter,
+        "Combined"
+    ),
+    (
+        day_010,
+        "../day-010-hoof-it/input.txt",
+        HoofIt,
         "Combined"
     ),
     // bench_marker

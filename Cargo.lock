@@ -83,6 +83,7 @@ dependencies = [
  "disk-fragmenter",
  "guard-gallivant",
  "historian-hysteria",
+ "hoof-it",
  "mull-it-over",
  "print-queue",
  "red-nosed-reports",
@@ -91,7 +92,7 @@ dependencies = [
 
 [[package]]
 name = "aoc-cli"
-version = "0.9.0"
+version = "0.10.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
@@ -102,6 +103,7 @@ dependencies = [
  "disk-fragmenter",
  "guard-gallivant",
  "historian-hysteria",
+ "hoof-it",
  "mull-it-over",
  "print-queue",
  "red-nosed-reports",
@@ -517,6 +519,18 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
+ "nom",
+ "rustc-hash",
+ "serde",
+]
+
+[[package]]
+name = "hoof-it"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-plumbing",
+ "aoc-std",
  "nom",
  "rustc-hash",
  "serde",

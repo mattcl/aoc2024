@@ -76,14 +76,24 @@ impl HoofIt {
             for (_dir, neighbor_loc, neighbor_val) in grid.cardinal_neighbors(&pos) {
                 if cur + 1 == *neighbor_val {
                     total += Self::_sum_trailheads(grid, neighbor_loc, cache);
-                    out.extend(
-                        cache.locations[neighbor_loc.row][neighbor_loc.col]
+                    // cloning in this instance would be way cheaper than having
+                    // to compute a bunch of hashes on extend.
+                    if out.is_empty() {
+                        out = cache.locations[neighbor_loc.row][neighbor_loc.col]
                             .as_ref()
                             .unwrap()
                             .unique
-                            .iter()
-                            .copied(),
-                    );
+                            .clone();
+                    } else {
+                        out.extend(
+                            cache.locations[neighbor_loc.row][neighbor_loc.col]
+                                .as_ref()
+                                .unwrap()
+                                .unique
+                                .iter()
+                                .copied(),
+                        );
+                    }
                 }
             }
 

@@ -96,7 +96,7 @@ impl Problem for DiskFragmenter {
     fn part_two(&mut self) -> Result<Self::P2, Self::ProblemError> {
         let mut checksum = 0;
 
-        'outer: for idx in 0..self.files.len() {
+        for idx in 0..self.files.len() {
             let tail = self.files.len() - 1 - idx;
             let cur = self.files[tail];
 
@@ -114,30 +114,21 @@ impl Problem for DiskFragmenter {
             }
 
             if min_bucket < usize::MAX && min_pos < cur.pos {
-                if let Some(buckets) = self.free_buckets.get_mut(min_bucket) {
-                    if buckets.is_empty() {
-                        continue;
-                    }
+                // we know this isn't empty because we just checked when
+                // finding the min
+                let free_pos = self.free_buckets[min_bucket].pop_first().unwrap();
 
-                    let free_pos = buckets.pop_first().unwrap();
-                    if free_pos >= cur.pos {
-                        continue;
-                    }
+                let rem = min_bucket - cur.size;
 
-                    let rem = min_bucket - cur.size;
+                checksum += cur.checksum(free_pos);
 
-                    checksum += cur.checksum(free_pos);
-
-                    if rem > 0 {
-                        self.free_buckets[rem].insert(free_pos + cur.size);
-                    }
-
-                    continue 'outer;
+                if rem > 0 {
+                    self.free_buckets[rem].insert(free_pos + cur.size);
                 }
+            } else {
+                // if we're here, we couldn't move, so calculate the checkum in place
+                checksum += cur.checksum(cur.pos);
             }
-
-            // if we're here, we couldn't move, so calculate the checkum in place
-            checksum += cur.checksum(cur.pos);
         }
 
         Ok(checksum)

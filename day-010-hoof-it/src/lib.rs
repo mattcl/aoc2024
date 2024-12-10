@@ -34,8 +34,11 @@ impl HoofIt {
             for c in 0..grid.width() {
                 if grid.locations[r][c] == 0 {
                     let origin = Location::new(r, c);
-                    let (unique, total) = Self::_sum_trailheads(grid, origin, &mut cache);
-                    sum.x += unique.len() as u16;
+                    let total = Self::_sum_trailheads(grid, origin, &mut cache);
+                    sum.x += cache
+                        .get(&origin)
+                        .map(|v| v.as_ref().map(|e| e.unique.len()).unwrap_or_default())
+                        .unwrap_or_default() as u16;
                     sum.y += total;
                 }
             }
@@ -47,42 +50,49 @@ impl HoofIt {
         grid: &DigitGrid,
         pos: Location,
         cache: &mut Grid<Option<CacheEntry>>,
-    ) -> (FxHashSet<Location>, u16) {
+    ) -> u16 {
         if let Some(cur) = grid.get(&pos).copied() {
             if cur == 9 {
                 let mut out = FxHashSet::default();
                 out.insert(pos);
-                return (out, 1);
+                cache
+                    .set(
+                        &pos,
+                        Some(CacheEntry {
+                            unique: out,
+                            total: 1,
+                        }),
+                    )
+                    .unwrap();
+                return 1;
             }
 
             if let Some(Some(cached)) = cache.get(&pos) {
-                if cached.total != u16::MAX {
-                    return (cached.unique.clone(), cached.total);
-                }
+                return cached.total;
             }
 
             let mut out = FxHashSet::default();
             let mut total = 0;
             for (_dir, neighbor_loc, neighbor_val) in grid.cardinal_neighbors(&pos) {
                 if cur + 1 == *neighbor_val {
-                    let (unique, n_total) = Self::_sum_trailheads(grid, neighbor_loc, cache);
-                    out.extend(unique.into_iter());
-                    total += n_total;
+                    total += Self::_sum_trailheads(grid, neighbor_loc, cache);
+                    out.extend(
+                        cache.locations[neighbor_loc.row][neighbor_loc.col]
+                            .as_ref()
+                            .unwrap()
+                            .unique
+                            .iter()
+                            .copied(),
+                    );
                 }
             }
 
             cache
-                .set(
-                    &pos,
-                    Some(CacheEntry {
-                        unique: out.clone(),
-                        total,
-                    }),
-                )
+                .set(&pos, Some(CacheEntry { unique: out, total }))
                 .unwrap();
-            (out, total)
+            total
         } else {
-            (FxHashSet::default(), 0)
+            0
         }
     }
 }
@@ -91,15 +101,6 @@ impl HoofIt {
 struct CacheEntry {
     unique: FxHashSet<Location>,
     total: u16,
-}
-
-impl Default for CacheEntry {
-    fn default() -> Self {
-        Self {
-            unique: FxHashSet::default(),
-            total: u16::MAX,
-        }
-    }
 }
 
 impl Problem for HoofIt {

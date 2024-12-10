@@ -7,7 +7,7 @@ use aoc_std::{
     geometry::Location,
 };
 use rayon::prelude::*;
-use rustc_hash::{FxHashMap, FxHashSet};
+use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 
 #[derive(Debug, Clone)]
 pub struct GuardGallivant {
@@ -57,7 +57,7 @@ impl FromStr for GuardGallivant {
 impl GuardGallivant {
     /// check if the specified configuration produces a loop
     fn valid_configuration(&self, mut guard: Guard, obstruction: Location) -> bool {
-        let mut seen = FxHashSet::default();
+        let mut seen = FxHashSet::with_capacity_and_hasher(100, FxBuildHasher);
         seen.insert(guard);
         loop {
             // given our current position and heading, get the next obstacle
@@ -115,11 +115,9 @@ impl GuardGallivant {
 
             guard.facing = guard.facing.right();
 
-            if seen.contains(&guard) {
+            if !seen.insert(guard) {
                 return true;
             }
-
-            seen.insert(guard);
         }
     }
 }

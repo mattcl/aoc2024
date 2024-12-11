@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use aoc_plumbing::Problem;
+// use cached::proc_macro::cached;
 use rustc_hash::{FxBuildHasher, FxHashMap};
 
 #[derive(Debug, Clone)]
@@ -20,26 +21,48 @@ impl FromStr for PlutoniumPebbles {
             if i == 25 {
                 p1 = cur.values().sum();
             }
-            for (k, v) in cur.drain() {
-                if k == 0 {
-                    *next.entry(1).or_default() += v;
-                } else if let Some((left, right)) = split_even_digits(k) {
-                    *next.entry(left).or_default() += v;
-                    *next.entry(right).or_default() += v;
+            for (k, v) in cur.iter() {
+                if *k == 0 {
+                    *next.entry(1).or_default() += *v;
+                } else if let Some((left, right)) = split_even_digits(*k) {
+                    *next.entry(left).or_default() += *v;
+                    *next.entry(right).or_default() += *v;
                 } else {
-                    *next.entry(k * 2024).or_default() += v;
+                    *next.entry(*k * 2024).or_default() += *v;
                 }
             }
+
+            cur.clear();
 
             std::mem::swap(&mut cur, &mut next);
         }
 
         let p2 = cur.values().sum();
 
+        // this is much slower
+        // // we have to clear for benchmarks
+        // DFS_CACHED.lock().unwrap().cache_reset();
+        // let p1 = cur.keys().map(|k| dfs_cached(*k, 25)).sum();
+        // let p2 = cur.keys().map(|k| dfs_cached(*k, 75)).sum();
 
         Ok(Self { p1, p2 })
     }
 }
+
+// #[cached]
+// fn dfs_cached(stone: u64, blinks: usize) -> usize {
+//     if blinks == 0 {
+//         return 1;
+//     }
+
+//     if stone == 0 {
+//         dfs_cached(1, blinks - 1)
+//     } else if let Some((left, right)) = split_even_digits(stone) {
+//         dfs_cached(left, blinks - 1) + dfs_cached(right, blinks - 1)
+//     } else {
+//         dfs_cached(stone * 2024, blinks - 1)
+//     }
+// }
 
 fn split_even_digits(stone: u64) -> Option<(u64, u64)> {
     let digits = stone.checked_ilog10().unwrap_or(0) + 1;

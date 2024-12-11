@@ -14,7 +14,8 @@ impl FromStr for PlutoniumPebbles {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut cur = s.trim().split(' ').map(|v| v.parse::<u64>().map(|a| (a, 1))).collect::<std::result::Result<FxHashMap<u64, usize>, _>>()?;
+        let mut cur = FxHashMap::with_capacity_and_hasher(4000, FxBuildHasher);
+        cur.extend(s.trim().split(' ').map(|v| v.parse::<u64>().map(|a| (a, 1))).collect::<std::result::Result<FxHashMap<u64, usize>, _>>()?);
         let mut next = FxHashMap::with_capacity_and_hasher(4000, FxBuildHasher);
         let mut p1 = 0;
         for i in 0..75 {

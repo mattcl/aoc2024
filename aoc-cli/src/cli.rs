@@ -17,6 +17,7 @@ use mull_it_over::MullItOver;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
 use resonant_collinearity::ResonantCollinearity;
+use plutonium_pebbles::PlutoniumPebbles;
 // import_marker
 
 // I'm not proud
@@ -184,5 +185,6 @@ generate_cli! {
     (ResonantCollinearity, 8),
     (DiskFragmenter, 9),
     (HoofIt, 10),
+    (PlutoniumPebbles, 11),
     // command_marker
 }

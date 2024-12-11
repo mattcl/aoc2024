@@ -11,6 +11,7 @@ use mull_it_over::MullItOver;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
 use resonant_collinearity::ResonantCollinearity;
+use plutonium_pebbles::PlutoniumPebbles;
 // import_marker
 
 criterion_main! {
@@ -80,6 +81,12 @@ aoc_benches! {
         day_010,
         "../day-010-hoof-it/input.txt",
         HoofIt,
+        "Combined"
+    ),
+    (
+        day_011,
+        "../day-011-plutonium-pebbles/input.txt",
+        PlutoniumPebbles,
         "Combined"
     ),
     // bench_marker

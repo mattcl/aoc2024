@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use aoc_plumbing::Problem;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxBuildHasher, FxHashMap};
 
 #[derive(Debug, Clone)]
 pub struct PlutoniumPebbles {
@@ -14,7 +14,7 @@ impl FromStr for PlutoniumPebbles {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut cur = s.trim().split(' ').map(|v| v.parse::<u64>().map(|a| (a, 1))).collect::<std::result::Result<FxHashMap<u64, usize>, _>>()?;
-        let mut next = FxHashMap::default();
+        let mut next = FxHashMap::with_capacity_and_hasher(4000, FxBuildHasher);
         let mut p1 = 0;
         for i in 0..75 {
             if i == 25 {

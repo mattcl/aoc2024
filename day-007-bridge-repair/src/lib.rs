@@ -303,17 +303,7 @@ impl Equation {
 }
 
 fn digits(val: i64) -> u8 {
-    let mut digits = 0;
-    let mut cur = val;
-    while cur > 0 {
-        if cur == 10 {
-            digits += 2;
-            break;
-        }
-        digits += 1;
-        cur /= 10;
-    }
-    digits.max(1) as u8
+    (val.checked_ilog10().unwrap_or(0) + 1) as u8
 }
 
 fn parse_equations(input: &str) -> IResult<&str, Vec<Equation>> {

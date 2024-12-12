@@ -19,5 +19,5 @@ flame DAY:
     scripts/flame.sh {{DAY}}
 
 # builds the cli
-build-cli:
-    cargo build -p aoc-cli --release
+build-cli *FLAGS:
+    cargo build -p aoc-cli --release {{ FLAGS }}

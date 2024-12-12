@@ -4,6 +4,7 @@ use aoc_benchmarking::aoc_benches;
 use bridge_repair::BridgeRepair;
 use ceres_search::CeresSearch;
 use disk_fragmenter::DiskFragmenter;
+use garden_groups::GardenGroups;
 use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
 use hoof_it::HoofIt;
@@ -12,7 +13,6 @@ use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
 use resonant_collinearity::ResonantCollinearity;
-use garden_groups::GardenGroups;
 // import_marker
 
 criterion_main! {

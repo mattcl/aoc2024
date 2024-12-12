@@ -25,7 +25,6 @@ const LRI: u8 = 0;
 const LRO: u8 = Direction::South as u8 | Direction::East as u8;
 const LRN: u8 = Direction::SouthEast as u8;
 
-
 #[derive(Debug, Clone)]
 pub struct GardenGroups {
     p1: u64,
@@ -56,7 +55,13 @@ impl GardenGroups {
             for c in 0..grid.width() {
                 let loc = Location::new(r, c);
                 if !seen.contains(&loc) {
-                    let (corners, perimeter, area) = Self::corners_area_and_perimeter(&mut queue, grid, &loc, grid.locations[r][c], &mut seen);
+                    let (corners, perimeter, area) = Self::corners_area_and_perimeter(
+                        &mut queue,
+                        grid,
+                        &loc,
+                        grid.locations[r][c],
+                        &mut seen,
+                    );
                     p1_total += perimeter * area;
                     p2_total += corners * area;
                 }
@@ -67,23 +72,27 @@ impl GardenGroups {
     }
 
     // the total number of corners will be equal to the total number of sides
-    fn corners_area_and_perimeter(cur: &mut VecDeque<Location>, grid: &CharGrid, pos: &Location, label: char, seen: &mut WideGrid) -> (u64, u64, u64) {
+    fn corners_area_and_perimeter(
+        cur: &mut VecDeque<Location>,
+        grid: &CharGrid,
+        pos: &Location,
+        label: char,
+        seen: &mut WideGrid,
+    ) -> (u64, u64, u64) {
         cur.clear();
         cur.push_front(*pos);
+        seen.insert(pos);
 
         let mut total_corners = 0;
         let mut perimeter = 0;
         let mut area = 0;
 
-        let cardinal = Direction::North as u8 | Direction::East as u8 | Direction::West as u8 | Direction::South as u8;
+        let cardinal = Direction::North as u8
+            | Direction::East as u8
+            | Direction::West as u8
+            | Direction::South as u8;
 
         while let Some(next) = cur.pop_front() {
-            if seen.contains(&next) {
-                continue;
-            }
-
-            seen.insert(&next);
-
             area += 1;
 
             let mut num_edges = 4;
@@ -94,6 +103,7 @@ impl GardenGroups {
                     if dir as u8 & cardinal != 0 {
                         num_edges -= 1;
                         if !seen.contains(&neighbor_loc) {
+                            seen.insert(&neighbor_loc);
                             cur.push_back(neighbor_loc);
                         }
                     }
@@ -129,7 +139,6 @@ impl GardenGroups {
         }
 
         (total_corners, perimeter, area)
-
     }
 }
 
@@ -158,7 +167,9 @@ pub struct WideGrid {
 
 impl WideGrid {
     pub fn new(height: usize) -> Self {
-        Self { rows: vec![WideMap::default(); height] }
+        Self {
+            rows: vec![WideMap::default(); height],
+        }
     }
 
     pub fn insert(&mut self, location: &Location) {

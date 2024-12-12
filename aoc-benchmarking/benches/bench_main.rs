@@ -12,6 +12,7 @@ use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
 use resonant_collinearity::ResonantCollinearity;
+use garden_groups::GardenGroups;
 // import_marker
 
 criterion_main! {
@@ -87,6 +88,12 @@ aoc_benches! {
         day_011,
         "../day-011-plutonium-pebbles/input.txt",
         PlutoniumPebbles,
+        "Combined"
+    ),
+    (
+        day_012,
+        "../day-012-garden-groups/input.txt",
+        GardenGroups,
         "Combined"
     ),
     // bench_marker

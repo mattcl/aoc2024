@@ -2,25 +2,26 @@
 
 As usual, no-unsafe, performance-oriented Solutions.
 
-## Current runtime ~4.262 ms
+## Current runtime ~4.972 ms
 
 ```
 ❯ aoc-tools criterion-summary target/criterion
 +------------------------------------------------------+
 | Problem                     Time (ms)   % Total Time |
 +======================================================+
-| 001 historian hysteria        0.03655          0.858 |
-| 002 red nosed reports         0.09264          2.173 |
-| 003 mull it over              0.01536          0.360 |
-| 004 ceres search              0.30712          7.205 |
-| 005 print queue               0.04655          1.092 |
-| 006 guard gallivant           0.59784         14.026 |
-| 007 bridge repair             0.40002          9.385 |
-| 008 resonant collinearity     0.00915          0.215 |
-| 009 disk fragmenter           0.66319         15.559 |
-| 010 hoof it                   0.14421          3.383 |
-| 011 plutonium pebbles         1.94971         45.743 |
-| Total                         4.26235        100.000 |
+| 001 historian hysteria        0.03655          0.735 |
+| 002 red nosed reports         0.09264          1.863 |
+| 003 mull it over              0.01536          0.309 |
+| 004 ceres search              0.30712          6.177 |
+| 005 print queue               0.04655          0.936 |
+| 006 guard gallivant           0.59784         12.025 |
+| 007 bridge repair             0.40002          8.046 |
+| 008 resonant collinearity     0.00915          0.184 |
+| 009 disk fragmenter           0.66319         13.339 |
+| 010 hoof it                   0.14421          2.901 |
+| 011 plutonium pebbles         1.94207         39.061 |
+| 012 garden groups             0.71713         14.424 |
+| Total                         4.97183        100.000 |
 +------------------------------------------------------+
 ```
 

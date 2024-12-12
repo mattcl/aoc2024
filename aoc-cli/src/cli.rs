@@ -18,6 +18,7 @@ use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
 use resonant_collinearity::ResonantCollinearity;
+use garden_groups::GardenGroups;
 // import_marker
 
 // I'm not proud
@@ -186,5 +187,6 @@ generate_cli! {
     (DiskFragmenter, 9),
     (HoofIt, 10),
     (PlutoniumPebbles, 11),
+    (GardenGroups, 12),
     // command_marker
 }

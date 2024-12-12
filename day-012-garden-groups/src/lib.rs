@@ -1,29 +1,17 @@
 use std::{collections::VecDeque, str::FromStr};
 
 use aoc_plumbing::Problem;
-use aoc_std::{collections::CharGrid, directions::Direction, geometry::Location};
+use aoc_std::{
+    collections::CharGrid,
+    directions::{Cardinal, Direction},
+    geometry::Location,
+};
 
 // Corner checking BS
-const UL: u8 = Direction::North as u8 | Direction::West as u8 | Direction::NorthWest as u8;
-const UR: u8 = Direction::North as u8 | Direction::East as u8 | Direction::NorthEast as u8;
-const LL: u8 = Direction::South as u8 | Direction::West as u8 | Direction::SouthWest as u8;
-const LR: u8 = Direction::South as u8 | Direction::East as u8 | Direction::SouthEast as u8;
-
-const ULI: u8 = 0;
-const ULO: u8 = Direction::North as u8 | Direction::West as u8;
-const ULN: u8 = Direction::NorthWest as u8;
-
-const URI: u8 = 0;
-const URO: u8 = Direction::North as u8 | Direction::East as u8;
-const URN: u8 = Direction::NorthEast as u8;
-
-const LLI: u8 = 0;
-const LLO: u8 = Direction::South as u8 | Direction::West as u8;
-const LLN: u8 = Direction::SouthWest as u8;
-
-const LRI: u8 = 0;
-const LRO: u8 = Direction::South as u8 | Direction::East as u8;
-const LRN: u8 = Direction::SouthEast as u8;
+const UL: u8 = Cardinal::North as u8 | Cardinal::West as u8;
+const UR: u8 = Direction::North as u8 | Cardinal::East as u8;
+const LL: u8 = Cardinal::South as u8 | Cardinal::West as u8;
+const LR: u8 = Cardinal::South as u8 | Cardinal::East as u8;
 
 #[derive(Debug, Clone)]
 pub struct GardenGroups {
@@ -87,52 +75,44 @@ impl GardenGroups {
         let mut perimeter = 0;
         let mut area = 0;
 
-        let cardinal = Direction::North as u8
-            | Direction::East as u8
-            | Direction::West as u8
-            | Direction::South as u8;
-
         while let Some(next) = cur.pop_front() {
             area += 1;
 
             let mut num_edges = 4;
             let mut dir_map = 0_u8;
-            for (dir, neighbor_loc, neighbor_value) in grid.neighbors(&next) {
+            for (dir, neighbor_loc, neighbor_value) in grid.cardinal_neighbors(&next) {
                 if neighbor_value == &label {
                     dir_map |= dir as u8;
-                    if dir as u8 & cardinal != 0 {
-                        num_edges -= 1;
-                        if !seen.contains(&neighbor_loc) {
-                            seen.insert(&neighbor_loc);
-                            cur.push_back(neighbor_loc);
-                        }
+                    num_edges -= 1;
+                    if !seen.contains(&neighbor_loc) {
+                        seen.insert(&neighbor_loc);
+                        cur.push_back(neighbor_loc);
                     }
                 }
             }
 
-            // check all the corner configurations.
-            if dir_map == 0 {
-                total_corners += 4;
-            } else {
-                let ul = dir_map & UL;
-                if ul == ULI || ul == ULO || ul == ULN {
-                    total_corners += 1;
-                }
+            // upper left
+            let ul = UL & dir_map;
+            if ul == 0 || (ul == UL && grid.locations[next.row - 1][next.col - 1] != label) {
+                total_corners += 1;
+            }
 
-                let ur = dir_map & UR;
-                if ur == URI || ur == URO || ur == URN {
-                    total_corners += 1;
-                }
+            // upper right
+            let ur = UR & dir_map;
+            if ur == 0 || (ur == UR && grid.locations[next.row - 1][next.col + 1] != label) {
+                total_corners += 1;
+            }
 
-                let ll = dir_map & LL;
-                if ll == LLI || ll == LLO || ll == LLN {
-                    total_corners += 1;
-                }
+            // lower left
+            let ll = LL & dir_map;
+            if ll == 0 || (ll == LL && grid.locations[next.row + 1][next.col - 1] != label) {
+                total_corners += 1;
+            }
 
-                let lr = dir_map & LR;
-                if lr == LRI || lr == LRO || lr == LRN {
-                    total_corners += 1;
-                }
+            // lower right
+            let lr = LR & dir_map;
+            if lr == 0 || (lr == LR && grid.locations[next.row + 1][next.col + 1] != label) {
+                total_corners += 1;
             }
 
             perimeter += num_edges;

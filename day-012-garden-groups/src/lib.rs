@@ -3,13 +3,13 @@ use std::{collections::VecDeque, str::FromStr};
 use aoc_plumbing::Problem;
 use aoc_std::{
     collections::CharGrid,
-    directions::{Cardinal, Direction},
+    directions::Cardinal,
     geometry::Location,
 };
 
 // Corner checking BS
 const UL: u8 = Cardinal::North as u8 | Cardinal::West as u8;
-const UR: u8 = Direction::North as u8 | Cardinal::East as u8;
+const UR: u8 = Cardinal::North as u8 | Cardinal::East as u8;
 const LL: u8 = Cardinal::South as u8 | Cardinal::West as u8;
 const LR: u8 = Cardinal::South as u8 | Cardinal::East as u8;
 

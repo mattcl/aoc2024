@@ -9,6 +9,7 @@ use bridge_repair::BridgeRepair;
 use ceres_search::CeresSearch;
 use clap::{Args, CommandFactory, Parser, Subcommand};
 use clap_complete::{generate, shells::Zsh};
+use claw_contraption::ClawContraption;
 use disk_fragmenter::DiskFragmenter;
 use garden_groups::GardenGroups;
 use guard_gallivant::GuardGallivant;
@@ -188,5 +189,6 @@ generate_cli! {
     (HoofIt, 10),
     (PlutoniumPebbles, 11),
     (GardenGroups, 12),
+    (ClawContraption, 13),
     // command_marker
 }

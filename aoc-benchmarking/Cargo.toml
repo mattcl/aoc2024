@@ -25,3 +25,4 @@ disk-fragmenter = { path = "../day-009-disk-fragmenter" }
 hoof-it = { path = "../day-010-hoof-it" }
 plutonium-pebbles = { path = "../day-011-plutonium-pebbles" }
 garden-groups = { path = "../day-012-garden-groups" }
+claw-contraption = { path = "../day-013-claw-contraption" }

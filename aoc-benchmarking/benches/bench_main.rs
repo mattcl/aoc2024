@@ -3,6 +3,7 @@ use criterion::criterion_main;
 use aoc_benchmarking::aoc_benches;
 use bridge_repair::BridgeRepair;
 use ceres_search::CeresSearch;
+use claw_contraption::ClawContraption;
 use disk_fragmenter::DiskFragmenter;
 use garden_groups::GardenGroups;
 use guard_gallivant::GuardGallivant;
@@ -95,6 +96,13 @@ aoc_benches! {
         "../day-012-garden-groups/input.txt",
         GardenGroups,
         "Combined"
+    ),
+    (
+        day_013,
+        "../day-013-claw-contraption/input.txt",
+        ClawContraption,
+        "Part 1",
+        "Part 2"
     ),
     // bench_marker
 }

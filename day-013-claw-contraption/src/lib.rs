@@ -138,7 +138,7 @@ mod tests {
     fn full_dataset() {
         let input = std::fs::read_to_string("input.txt").expect("Unable to load input");
         let solution = ClawContraption::solve(&input).unwrap();
-        assert_eq!(solution, Solution::new(35997, 0));
+        assert_eq!(solution, Solution::new(35997, 82510994362072));
     }
 
     #[test]

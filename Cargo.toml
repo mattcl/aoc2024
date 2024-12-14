@@ -10,7 +10,7 @@ members = [
 exclude = ["template"]
 
 [workspace.dependencies]
-aoc-std = { version = "0.4", registry = "ancalagon" }
+aoc-std = { version = "0.5", registry = "ancalagon" }
 anyhow = "1.0.93"
 cached = "0.54.0"
 itertools = "0.13.0"

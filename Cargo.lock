@@ -109,11 +109,12 @@ dependencies = [
  "print-queue",
  "red-nosed-reports",
  "resonant-collinearity",
+ "restroom-redoubt",
 ]
 
 [[package]]
 name = "aoc-cli"
-version = "0.13.0"
+version = "0.14.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
@@ -132,6 +133,7 @@ dependencies = [
  "print-queue",
  "red-nosed-reports",
  "resonant-collinearity",
+ "restroom-redoubt",
  "serde",
  "serde_json",
 ]
@@ -1013,6 +1015,18 @@ dependencies = [
  "nom",
  "num",
  "rayon",
+ "rustc-hash",
+ "serde",
+]
+
+[[package]]
+name = "restroom-redoubt"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-plumbing",
+ "aoc-std",
+ "nom",
  "rustc-hash",
  "serde",
 ]

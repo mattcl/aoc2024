@@ -14,6 +14,7 @@ use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
 use resonant_collinearity::ResonantCollinearity;
+use restroom_redoubt::RestroomRedoubt;
 // import_marker
 
 criterion_main! {
@@ -101,6 +102,13 @@ aoc_benches! {
         day_013,
         "../day-013-claw-contraption/input.txt",
         ClawContraption,
+        "Part 1",
+        "Part 2"
+    ),
+    (
+        day_014,
+        "../day-014-restroom-redoubt/input.txt",
+        RestroomRedoubt,
         "Part 1",
         "Part 2"
     ),

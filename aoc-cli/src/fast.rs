@@ -3,6 +3,7 @@ use std::env;
 use aoc_plumbing::Problem;
 use bridge_repair::BridgeRepair;
 use ceres_search::CeresSearch;
+use claw_contraption::ClawContraption;
 use disk_fragmenter::DiskFragmenter;
 use garden_groups::GardenGroups;
 use guard_gallivant::GuardGallivant;
@@ -13,6 +14,7 @@ use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
 use resonant_collinearity::ResonantCollinearity;
+use restroom_redoubt::RestroomRedoubt;
 
 pub fn run() -> anyhow::Result<()> {
     let day: u8 = env::var("AOC_DAY")?.parse()?;
@@ -32,6 +34,8 @@ pub fn run() -> anyhow::Result<()> {
         10 => serde_json::to_string(&HoofIt::solve(&input)?)?,
         11 => serde_json::to_string(&PlutoniumPebbles::solve(&input)?)?,
         12 => serde_json::to_string(&GardenGroups::solve(&input)?)?,
+        13 => serde_json::to_string(&ClawContraption::solve(&input)?)?,
+        14 => serde_json::to_string(&RestroomRedoubt::solve(&input)?)?,
         _ => "\"not implemented\"".into(),
     };
 

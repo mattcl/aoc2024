@@ -26,9 +26,9 @@ impl<const N: usize, const M: usize> FromStr for RestroomRedoubtGen<N, M> {
 }
 
 impl<const N: usize, const M: usize> RestroomRedoubtGen<N, M> {
-    pub fn classify(&self, point: &Point2D<i64>) -> Option<Quadrant> {
-        let mid_x = N as i64 / 2;
-        let mid_y = M as i64 / 2;
+    pub fn classify(&self, point: &Point2D<i32>) -> Option<Quadrant> {
+        let mid_x = N as i32 / 2;
+        let mid_y = M as i32 / 2;
 
         if point.x == mid_x || point.y == mid_y {
             return None;
@@ -45,10 +45,10 @@ impl<const N: usize, const M: usize> RestroomRedoubtGen<N, M> {
         })
     }
 
-    pub fn safety_factor(&self, seconds: i64) -> i64 {
+    pub fn safety_factor(&self, seconds: i32) -> i32 {
         let mut counts = [0; 4];
         for guard in self.guards.iter() {
-            let pos = guard.bound_position(seconds, N as i64, M as i64);
+            let pos = guard.bound_position(seconds, N as i32, M as i32);
             if let Some(q) = self.classify(&pos) {
                 counts[q as usize] += 1;
             }
@@ -57,27 +57,32 @@ impl<const N: usize, const M: usize> RestroomRedoubtGen<N, M> {
         counts.iter().product()
     }
 
-    pub fn tree(&self) -> i64 {
-        let mut cache = [0_u128; M];
+    pub fn tree(&self) -> i32 {
+        let mut x_pos = vec![vec![0; self.guards.len()]; N];
+        let mut y_pos = vec![vec![0; self.guards.len()]; M];
+        let mut cache = [[0; N]; M];
 
-        'outer: for i in 3000..10_000 {
-            for v in cache.iter_mut() {
-                *v = 0;
+        for idx in 0..M.max(N) {
+            for (g_idx, guard) in self.guards.iter().enumerate() {
+                let pos = guard.bound_position(idx as i32, N as i32, M as i32);
+                x_pos[idx % N][g_idx] = pos.x;
+                y_pos[idx % M][g_idx] = pos.y;
             }
-
-            for guard in self.guards.iter() {
-                let pos = guard.bound_position(i, N as i64, M as i64);
-                let mask: u128 = 1 << pos.x as usize;
-                if cache[pos.y as usize] & mask != 0 {
-                    continue 'outer;
-                }
-                cache[pos.y as usize] |= mask;
-            }
-
-            return i;
         }
 
-        i64::MIN
+        'outer: for i in 1000..10_000 {
+            for (x, y) in x_pos[i % N].iter().zip(y_pos[i % M].iter()) {
+                if cache[*y as usize][*x as usize] == i {
+                    continue 'outer;
+                }
+
+                cache[*y as usize][*x as usize] = i;
+            }
+
+            return i as i32;
+        }
+
+        i32::MIN
     }
 }
 
@@ -87,8 +92,8 @@ impl<const N: usize, const M: usize> Problem for RestroomRedoubtGen<N, M> {
     const README: &'static str = include_str!("../README.md");
 
     type ProblemError = anyhow::Error;
-    type P1 = i64;
-    type P2 = i64;
+    type P1 = i32;
+    type P2 = i32;
 
     fn part_one(&mut self) -> Result<Self::P1, Self::ProblemError> {
         Ok(self.safety_factor(100))
@@ -111,17 +116,17 @@ pub enum Quadrant {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct Guard {
-    origin: Point2D<i64>,
-    velocity: Point2D<i64>,
+    origin: Point2D<i32>,
+    velocity: Point2D<i32>,
 }
 
 impl Guard {
     #[inline]
-    pub fn raw_position(&self, seconds: i64) -> Point2D<i64> {
+    pub fn raw_position(&self, seconds: i32) -> Point2D<i32> {
         self.origin + self.velocity * seconds
     }
 
-    pub fn bound_position(&self, seconds: i64, width: i64, height: i64) -> Point2D<i64> {
+    pub fn bound_position(&self, seconds: i32, width: i32, height: i32) -> Point2D<i32> {
         let raw = self.raw_position(seconds);
         Point2D::new(raw.x.rem_euclid(width), raw.y.rem_euclid(height))
     }
@@ -136,17 +141,17 @@ fn parse_guard(input: &str) -> IResult<&str, Guard> {
         sequence::tuple((
             combinator::map(
                 separated_pair(
-                    preceded(tag("p="), complete::i64),
+                    preceded(tag("p="), complete::i32),
                     complete::char(','),
-                    complete::i64,
+                    complete::i32,
                 ),
                 |(x, y)| Point2D::new(x, y),
             ),
             combinator::map(
                 separated_pair(
-                    preceded(tag(" v="), complete::i64),
+                    preceded(tag(" v="), complete::i32),
                     complete::char(','),
-                    complete::i64,
+                    complete::i32,
                 ),
                 |(x, y)| Point2D::new(x, y),
             ),
@@ -184,6 +189,6 @@ p=7,3 v=-1,2
 p=2,4 v=2,-3
 p=9,5 v=-3,-3";
         let solution = RestroomRedoubtGen::<11, 7>::solve(input).unwrap();
-        assert_eq!(solution, Solution::new(12, 3000));
+        assert_eq!(solution, Solution::new(12, 1002));
     }
 }

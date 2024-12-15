@@ -39,24 +39,21 @@ impl FromStr for WarehouseWoes {
             }
         }
 
-        let mut wide_grid = CharGrid::default_with_dimensions(grid.width() * 2, grid.height());
+        let mut wide_grid = CharGrid::from(vec![vec!['.'; grid.width() * 2]; grid.height()]);
 
         for r in 0..grid.height() {
             for c in 0..grid.width() {
                 let wc = c * 2;
                 match grid.locations[r][c] {
                     '#' => {
-                        wide_grid.locations[r][wc] = '#';
                         wide_grid.locations[r][wc + 1] = '#';
+                        wide_grid.locations[r][wc] = '#';
                     }
                     'O' => {
-                        wide_grid.locations[r][wc] = '[';
                         wide_grid.locations[r][wc + 1] = ']';
+                        wide_grid.locations[r][wc] = '[';
                     }
-                    _ => {
-                        wide_grid.locations[r][wc] = '.';
-                        wide_grid.locations[r][wc + 1] = '.';
-                    }
+                    _ => {}
                 }
             }
         }
@@ -318,7 +315,7 @@ impl WarehouseWoes {
     }
 
     fn maybe_shift_north(
-        &mut self,
+        &self,
         left: &Location,
         right: &Location,
         seen: &mut BTreeSet<Location>,
@@ -327,44 +324,46 @@ impl WarehouseWoes {
             self.wide_grid.cardinal_neighbor(left, Cardinal::North),
             self.wide_grid.cardinal_neighbor(right, Cardinal::North),
         ) {
-            match (l_ch, r_ch) {
-                ('.', '.') => return true,
-                ('[', ']') => {
-                    seen.insert(l_loc);
-                    return self.maybe_shift_north(&l_loc, &r_loc, seen);
-                }
+            return match (l_ch, r_ch) {
+                ('.', '.') => true,
+                ('[', ']') => !seen.insert(l_loc) || self.maybe_shift_north(&l_loc, &r_loc, seen),
                 (']', '.') => {
                     let left = l_loc.cardinal_neighbor(Cardinal::West).unwrap();
-                    seen.insert(left);
-                    return self.maybe_shift_north(&left, &l_loc, seen);
+                    !seen.insert(left) || self.maybe_shift_north(&left, &l_loc, seen)
                 }
                 ('.', '[') => {
-                    seen.insert(r_loc);
-                    return self.maybe_shift_north(
-                        &r_loc,
-                        &r_loc.cardinal_neighbor(Cardinal::East).unwrap(),
-                        seen,
-                    );
-                }
-                (']', '[') => {
-                    let left = l_loc.cardinal_neighbor(Cardinal::West).unwrap();
-                    seen.insert(left);
-                    seen.insert(r_loc);
-                    return self.maybe_shift_north(&left, &l_loc, seen)
-                        && self.maybe_shift_north(
+                    !seen.insert(r_loc)
+                        || self.maybe_shift_north(
                             &r_loc,
                             &r_loc.cardinal_neighbor(Cardinal::East).unwrap(),
                             seen,
-                        );
+                        )
                 }
-                _ => return false,
-            }
+                (']', '[') => {
+                    let left = l_loc.cardinal_neighbor(Cardinal::West).unwrap();
+
+                    if seen.insert(left) && !self.maybe_shift_north(&left, &l_loc, seen) {
+                        return false;
+                    }
+
+                    if seen.insert(r_loc) {
+                        self.maybe_shift_north(
+                            &r_loc,
+                            &r_loc.cardinal_neighbor(Cardinal::East).unwrap(),
+                            seen,
+                        )
+                    } else {
+                        true
+                    }
+                }
+                _ => false,
+            };
         }
         false
     }
 
     fn maybe_shift_south(
-        &mut self,
+        &self,
         left: &Location,
         right: &Location,
         seen: &mut BTreeSet<Location>,
@@ -373,38 +372,40 @@ impl WarehouseWoes {
             self.wide_grid.cardinal_neighbor(left, Cardinal::South),
             self.wide_grid.cardinal_neighbor(right, Cardinal::South),
         ) {
-            match (l_ch, r_ch) {
-                ('.', '.') => return true,
-                ('[', ']') => {
-                    seen.insert(l_loc);
-                    return self.maybe_shift_south(&l_loc, &r_loc, seen);
-                }
+            return match (l_ch, r_ch) {
+                ('.', '.') => true,
+                ('[', ']') => !seen.insert(l_loc) || self.maybe_shift_south(&l_loc, &r_loc, seen),
                 (']', '.') => {
                     let left = l_loc.cardinal_neighbor(Cardinal::West).unwrap();
-                    seen.insert(left);
-                    return self.maybe_shift_south(&left, &l_loc, seen);
+                    !seen.insert(left) || self.maybe_shift_south(&left, &l_loc, seen)
                 }
                 ('.', '[') => {
-                    seen.insert(r_loc);
-                    return self.maybe_shift_south(
-                        &r_loc,
-                        &r_loc.cardinal_neighbor(Cardinal::East).unwrap(),
-                        seen,
-                    );
-                }
-                (']', '[') => {
-                    let left = l_loc.cardinal_neighbor(Cardinal::West).unwrap();
-                    seen.insert(left);
-                    seen.insert(r_loc);
-                    return self.maybe_shift_south(&left, &l_loc, seen)
-                        && self.maybe_shift_south(
+                    !seen.insert(r_loc)
+                        || self.maybe_shift_south(
                             &r_loc,
                             &r_loc.cardinal_neighbor(Cardinal::East).unwrap(),
                             seen,
-                        );
+                        )
                 }
-                _ => return false,
-            }
+                (']', '[') => {
+                    let left = l_loc.cardinal_neighbor(Cardinal::West).unwrap();
+
+                    if seen.insert(left) && !self.maybe_shift_south(&left, &l_loc, seen) {
+                        return false;
+                    }
+
+                    if seen.insert(r_loc) {
+                        self.maybe_shift_south(
+                            &r_loc,
+                            &r_loc.cardinal_neighbor(Cardinal::East).unwrap(),
+                            seen,
+                        )
+                    } else {
+                        true
+                    }
+                }
+                _ => false,
+            };
         }
         false
     }

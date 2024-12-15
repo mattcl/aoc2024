@@ -10,6 +10,7 @@ use nom::{
     sequence::{self, preceded, separated_pair},
     IResult,
 };
+use statrs::statistics::Statistics;
 
 #[derive(Debug, Clone)]
 pub struct RestroomRedoubtGen<const N: usize, const M: usize> {
@@ -63,43 +64,32 @@ impl<const N: usize, const M: usize> RestroomRedoubtGen<N, M> {
         // precalculcate the inverse based on the width and height we're expecting
         let inv = (N as i32).mod_inv(M as i32);
 
-        let guards_len = self.guards.len() as f64;
         let mut min_x = i32::MAX;
         let mut min_x_variance = f64::MAX;
         let mut min_y = i32::MAX;
         let mut min_y_variance = f64::MAX;
 
-        for idx in 0..M.max(N) {
-            let mut x_sum = 0;
-            let mut x_sq_sum = 0;
-            let mut y_sum = 0;
-            let mut y_sq_sum = 0;
-            for guard in self.guards.iter() {
-                let pos = guard.bound_position(idx as i32, N as i32, M as i32);
-                x_sum += pos.x;
-                x_sq_sum += pos.x * pos.x;
-                y_sum += pos.y;
-                y_sq_sum += pos.y * pos.y;
+        for t in 0..N as i32 {
+            let v = self
+                .guards
+                .iter()
+                .map(|g| g.bounded_x(t, N as i32) as f64)
+                .variance();
+            if v < min_x_variance {
+                min_x_variance = v;
+                min_x = t;
             }
+        }
 
-            // i guess we probably don't even need to actually compute the
-            // variance entirely to make the determination, but i'm going to
-            // leave that in for now
-            let x_mean = x_sum as f64 / guards_len;
-            let x_variance =
-                (x_sq_sum as f64 - (x_mean * x_mean) / guards_len) / (guards_len - 1.0);
-            let y_mean = y_sum as f64 / guards_len;
-            let y_variance =
-                (y_sq_sum as f64 - (y_mean * y_mean) / guards_len) / (guards_len - 1.0);
-
-            if x_variance < min_x_variance {
-                min_x = (idx % N) as i32;
-                min_x_variance = x_variance;
-            }
-
-            if y_variance < min_y_variance {
-                min_y = (idx % M) as i32;
-                min_y_variance = y_variance;
+        for t in 0..M as i32 {
+            let v = self
+                .guards
+                .iter()
+                .map(|g| g.bounded_y(t, M as i32) as f64)
+                .variance();
+            if v < min_y_variance {
+                min_y_variance = v;
+                min_y = t;
             }
         }
 
@@ -150,6 +140,14 @@ impl Guard {
     pub fn bound_position(&self, seconds: i32, width: i32, height: i32) -> Point2D<i32> {
         let raw = self.raw_position(seconds);
         Point2D::new(raw.x.rem_euclid(width), raw.y.rem_euclid(height))
+    }
+
+    pub fn bounded_x(&self, seconds: i32, width: i32) -> i32 {
+        (self.origin.x + self.velocity.x * seconds).rem_euclid(width)
+    }
+
+    pub fn bounded_y(&self, seconds: i32, height: i32) -> i32 {
+        (self.origin.y + self.velocity.y * seconds).rem_euclid(height)
     }
 }
 

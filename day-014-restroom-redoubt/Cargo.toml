@@ -10,6 +10,7 @@ description = "restroom redoubt"
 aoc-plumbing = { path = "../aoc-plumbing" }
 aoc-std = { workspace = true }
 anyhow = { workspace = true }
+statrs = "0.18.0"
 # itertools = { workspace = true }
 nom = { workspace = true }
 # rayon = { workspace = true }

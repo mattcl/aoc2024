@@ -21,6 +21,7 @@ use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
 use resonant_collinearity::ResonantCollinearity;
 use restroom_redoubt::RestroomRedoubt;
+use warehouse_woes::WarehouseWoes;
 // import_marker
 
 // I'm not proud
@@ -192,5 +193,6 @@ generate_cli! {
     (GardenGroups, 12),
     (ClawContraption, 13),
     (RestroomRedoubt, 14),
+    (WarehouseWoes, 15),
     // command_marker
 }

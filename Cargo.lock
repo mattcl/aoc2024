@@ -110,11 +110,12 @@ dependencies = [
  "red-nosed-reports",
  "resonant-collinearity",
  "restroom-redoubt",
+ "warehouse-woes",
 ]
 
 [[package]]
 name = "aoc-cli"
-version = "0.14.2"
+version = "0.15.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
@@ -136,6 +137,7 @@ dependencies = [
  "restroom-redoubt",
  "serde",
  "serde_json",
+ "warehouse-woes",
 ]
 
 [[package]]
@@ -1207,6 +1209,18 @@ checksum = "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b"
 dependencies = [
  "same-file",
  "winapi-util",
+]
+
+[[package]]
+name = "warehouse-woes"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-plumbing",
+ "aoc-std",
+ "nom",
+ "rustc-hash",
+ "serde",
 ]
 
 [[package]]

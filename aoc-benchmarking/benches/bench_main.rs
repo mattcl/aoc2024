@@ -15,6 +15,7 @@ use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
 use resonant_collinearity::ResonantCollinearity;
 use restroom_redoubt::RestroomRedoubt;
+use warehouse_woes::WarehouseWoes;
 // import_marker
 
 criterion_main! {
@@ -111,6 +112,12 @@ aoc_benches! {
         RestroomRedoubt,
         "Part 1",
         "Part 2"
+    ),
+    (
+        day_015,
+        "../day-015-warehouse-woes/input.txt",
+        WarehouseWoes,
+        "Combined"
     ),
     // bench_marker
 }

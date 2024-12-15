@@ -4,7 +4,7 @@ use anyhow::anyhow;
 use aoc_plumbing::Problem;
 use aoc_std::{
     collections::CharGrid,
-    directions::{BoundedCardinalNeighbors, Cardinal},
+    directions::{BoundedCardinalNeighbors, Cardinal, Direction},
     geometry::Location,
 };
 
@@ -88,15 +88,15 @@ impl WarehouseWoes {
 
         for m in 0..self.movements.len() {
             let dir = self.movements[m];
-            if self.maybe_shift_boxes(&pos, dir) {
-                pos = pos.cardinal_neighbor(dir).unwrap();
+            if let Some(next) = self.maybe_shift_boxes(&pos, dir) {
+                pos = next;
             }
         }
 
         let mut out = 0;
 
-        for r in 0..self.grid.height() {
-            for c in 0..self.grid.width() {
+        for r in 1..self.grid.height() - 1 {
+            for c in 1..self.grid.width() - 1 {
                 if self.grid.locations[r][c] == 'O' {
                     out += r * 100 + c;
                 }
@@ -112,15 +112,15 @@ impl WarehouseWoes {
 
         for m in 0..self.movements.len() {
             let dir = self.movements[m];
-            if self.maybe_shift_wide_boxes(&pos, dir) {
-                pos = pos.cardinal_neighbor(dir).unwrap();
+            if let Some(next) = self.maybe_shift_wide_boxes(&pos, dir) {
+                pos = next;
             }
         }
 
         let mut out = 0;
 
-        for r in 0..self.wide_grid.height() {
-            for c in 0..self.wide_grid.width() {
+        for r in 1..self.wide_grid.height() - 1 {
+            for c in 2..self.wide_grid.width() - 2 {
                 if self.wide_grid.locations[r][c] == '[' {
                     out += r * 100 + c;
                 }
@@ -130,39 +130,51 @@ impl WarehouseWoes {
         out
     }
 
-    fn maybe_shift_boxes(&mut self, loc: &Location, direction: Cardinal) -> bool {
+    fn maybe_shift_boxes(&mut self, loc: &Location, direction: Cardinal) -> Option<Location> {
         if let Some((nloc, nch)) = self.grid.cardinal_neighbor(loc, direction) {
             match nch {
-                '.' => return true,
+                '.' => return Some(nloc),
                 'O' => {
-                    if self.maybe_shift_boxes(&nloc, direction) {
-                        let bloc = nloc.cardinal_neighbor(direction).unwrap();
-                        self.grid.set(&bloc, 'O').unwrap();
+                    if let Some(last) = self.maybe_shift_dir(&nloc, direction) {
+                        self.grid.set(&last, 'O').unwrap();
                         self.grid.set(&nloc, '.').unwrap();
-                        return true;
+                        return Some(nloc);
                     }
                 }
-                _ => return false,
+                _ => return None,
             }
         }
-        false
+        None
     }
 
-    fn maybe_shift_wide_boxes(&mut self, loc: &Location, direction: Cardinal) -> bool {
+    fn maybe_shift_dir(&self, loc: &Location, direction: Cardinal) -> Option<Location> {
+        if let Some((nloc, nch)) = self.grid.cardinal_neighbor(loc, direction) {
+            return match nch {
+                '.' => Some(nloc),
+                'O' => self.maybe_shift_dir(&nloc, direction),
+                _ => None,
+            };
+        }
+        None
+    }
+
+    fn maybe_shift_wide_boxes(&mut self, loc: &Location, direction: Cardinal) -> Option<Location> {
         if let Some((nloc, nch)) = self.wide_grid.cardinal_neighbor(loc, direction) {
             match nch {
-                '.' => return true,
+                '.' => return Some(nloc),
                 '[' => {
                     match direction {
                         // easy
                         Cardinal::East => {
-                            if self
-                                .maybe_shift_east(&nloc.cardinal_neighbor(Cardinal::East).unwrap())
-                            {
+                            let mut seen = Vec::default();
+                            seen.push(nloc);
+                            if self.maybe_shift_east(&nloc, &mut seen) {
+                                for s in seen.iter().rev() {
+                                    self.wide_grid.locations[s.row][s.col + 2] = ']';
+                                    self.wide_grid.locations[s.row][s.col + 1] = '[';
+                                }
                                 self.wide_grid.locations[nloc.row][nloc.col] = '.';
-                                self.wide_grid.locations[nloc.row][nloc.col + 1] = '[';
-                                self.wide_grid.locations[nloc.row][nloc.col + 2] = ']';
-                                return true;
+                                return Some(nloc);
                             }
                         }
 
@@ -183,7 +195,7 @@ impl WarehouseWoes {
 
                                 self.wide_grid.locations[right.row][right.col] = '.';
                                 self.wide_grid.locations[right.row - 1][right.col] = ']';
-                                return true;
+                                return Some(nloc);
                             }
                         }
                         Cardinal::South => {
@@ -203,7 +215,7 @@ impl WarehouseWoes {
 
                                 self.wide_grid.locations[right.row][right.col] = '.';
                                 self.wide_grid.locations[right.row + 1][right.col] = ']';
-                                return true;
+                                return Some(nloc);
                             }
                         }
                         // should ot be possible
@@ -214,13 +226,15 @@ impl WarehouseWoes {
                     match direction {
                         // easy
                         Cardinal::West => {
-                            if self
-                                .maybe_shift_west(&nloc.cardinal_neighbor(Cardinal::West).unwrap())
-                            {
+                            let mut seen = Vec::default();
+                            seen.push(nloc);
+                            if self.maybe_shift_west(&nloc, &mut seen) {
+                                for s in seen.iter().rev() {
+                                    self.wide_grid.locations[s.row][s.col - 2] = '[';
+                                    self.wide_grid.locations[s.row][s.col - 1] = ']';
+                                }
                                 self.wide_grid.locations[nloc.row][nloc.col] = '.';
-                                self.wide_grid.locations[nloc.row][nloc.col - 1] = ']';
-                                self.wide_grid.locations[nloc.row][nloc.col - 2] = '[';
-                                return true;
+                                return Some(nloc);
                             }
                         }
 
@@ -241,7 +255,7 @@ impl WarehouseWoes {
 
                                 self.wide_grid.locations[nloc.row][nloc.col] = '.';
                                 self.wide_grid.locations[nloc.row - 1][nloc.col] = ']';
-                                return true;
+                                return Some(nloc);
                             }
                         }
                         Cardinal::South => {
@@ -260,53 +274,47 @@ impl WarehouseWoes {
 
                                 self.wide_grid.locations[nloc.row][nloc.col] = '.';
                                 self.wide_grid.locations[nloc.row + 1][nloc.col] = ']';
-                                return true;
+                                return Some(nloc);
                             }
                         }
                         // should ot be possible
                         Cardinal::East => unreachable!(),
                     }
                 }
-                _ => return false,
+                _ => return None,
             }
         }
-        false
+        None
     }
 
-    fn maybe_shift_east(&mut self, loc: &Location) -> bool {
-        if let Some((nloc, nch)) = self.wide_grid.cardinal_neighbor(loc, Cardinal::East) {
-            match nch {
-                '.' => return true,
-                '[' => {
-                    if self.maybe_shift_east(&nloc.cardinal_neighbor(Cardinal::East).unwrap()) {
-                        self.wide_grid.locations[nloc.row][nloc.col] = '.';
-                        self.wide_grid.locations[nloc.row][nloc.col + 1] = '[';
-                        self.wide_grid.locations[nloc.row][nloc.col + 2] = ']';
-                        return true;
-                    }
-                }
-                _ => return false,
+    fn maybe_shift_east(&self, loc: &Location, seen: &mut Vec<Location>) -> bool {
+        // we know these are safe because the grid is already padded
+        let nloc = loc.project(&Direction::East, 2).unwrap();
+        let nch = self.wide_grid.get(&nloc).unwrap();
+
+        match nch {
+            '.' => true,
+            '[' => {
+                seen.push(nloc);
+                self.maybe_shift_east(&nloc, seen)
             }
+            _ => false,
         }
-        false
     }
 
-    fn maybe_shift_west(&mut self, loc: &Location) -> bool {
-        if let Some((nloc, nch)) = self.wide_grid.cardinal_neighbor(loc, Cardinal::West) {
-            match nch {
-                '.' => return true,
-                ']' => {
-                    if self.maybe_shift_west(&nloc.cardinal_neighbor(Cardinal::West).unwrap()) {
-                        self.wide_grid.locations[nloc.row][nloc.col] = '.';
-                        self.wide_grid.locations[nloc.row][nloc.col - 1] = ']';
-                        self.wide_grid.locations[nloc.row][nloc.col - 2] = '[';
-                        return true;
-                    }
-                }
-                _ => return false,
+    fn maybe_shift_west(&self, loc: &Location, seen: &mut Vec<Location>) -> bool {
+        // we know these are safe because the grid is already padded
+        let nloc = loc.project(&Direction::West, 2).unwrap();
+        let nch = self.wide_grid.get(&nloc).unwrap();
+
+        match nch {
+            '.' => true,
+            ']' => {
+                seen.push(nloc);
+                self.maybe_shift_west(&nloc, seen)
             }
+            _ => false,
         }
-        false
     }
 
     fn maybe_shift_north(

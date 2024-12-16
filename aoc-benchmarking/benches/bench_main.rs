@@ -13,6 +13,7 @@ use mull_it_over::MullItOver;
 use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
+use reindeer_maze::ReindeerMaze;
 use resonant_collinearity::ResonantCollinearity;
 use restroom_redoubt::RestroomRedoubt;
 use warehouse_woes::WarehouseWoes;
@@ -117,6 +118,12 @@ aoc_benches! {
         day_015,
         "../day-015-warehouse-woes/input.txt",
         WarehouseWoes,
+        "Combined"
+    ),
+    (
+        day_016,
+        "../day-016-reindeer-maze/input.txt",
+        ReindeerMaze,
         "Combined"
     ),
     // bench_marker

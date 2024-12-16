@@ -28,3 +28,4 @@ garden-groups = { path = "../day-012-garden-groups" }
 claw-contraption = { path = "../day-013-claw-contraption" }
 restroom-redoubt = { path = "../day-014-restroom-redoubt" }
 warehouse-woes = { path = "../day-015-warehouse-woes" }
+reindeer-maze = { path = "../day-016-reindeer-maze" }

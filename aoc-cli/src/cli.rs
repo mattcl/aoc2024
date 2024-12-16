@@ -19,6 +19,7 @@ use mull_it_over::MullItOver;
 use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
 use red_nosed_reports::RedNosedReports;
+use reindeer_maze::ReindeerMaze;
 use resonant_collinearity::ResonantCollinearity;
 use restroom_redoubt::RestroomRedoubt;
 use warehouse_woes::WarehouseWoes;
@@ -194,5 +195,6 @@ generate_cli! {
     (ClawContraption, 13),
     (RestroomRedoubt, 14),
     (WarehouseWoes, 15),
+    (ReindeerMaze, 16),
     // command_marker
 }

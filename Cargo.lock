@@ -108,6 +108,7 @@ dependencies = [
  "plutonium-pebbles",
  "print-queue",
  "red-nosed-reports",
+ "reindeer-maze",
  "resonant-collinearity",
  "restroom-redoubt",
  "warehouse-woes",
@@ -115,7 +116,7 @@ dependencies = [
 
 [[package]]
 name = "aoc-cli"
-version = "0.15.2"
+version = "0.16.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
@@ -133,6 +134,7 @@ dependencies = [
  "plutonium-pebbles",
  "print-queue",
  "red-nosed-reports",
+ "reindeer-maze",
  "resonant-collinearity",
  "restroom-redoubt",
  "serde",
@@ -1139,6 +1141,18 @@ name = "regex-syntax"
 version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
+
+[[package]]
+name = "reindeer-maze"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-plumbing",
+ "aoc-std",
+ "nom",
+ "rustc-hash",
+ "serde",
+]
 
 [[package]]
 name = "resonant-collinearity"

@@ -31,14 +31,32 @@ impl FromStr for ChronospatialComputer {
         let (_, a) = parse_registers(raw_registers).map_err(|e| e.to_owned())?;
         let (_, program) = parse_program(raw_program).map_err(|e| e.to_owned())?;
 
-        // these are fixed positions in the program that vary between inputs
+        //   for my input,
+        //   0 bst 4  b = a & 0b111
+        //   2 bxl 3  b = b ^ 3
+        //   4 cdv 5  c = a >> b
+        //   6 bxc 1  b = b ^ c
+        //   8 bxl 3  b = b ^ 3
+        //  10 adv 3  a = a >> 3
+        //  12 out 5  out b & 0b111
+        //  14 jnz 0  goto 0 if a != 0
         //
-        // they must always be in their expectd locations
+        // i've been told that the position of the second bxl varies a bit
+        //
+        // this is the example expected locations from my input
         // expected = [2, 4, 1, v1, 7, 5, 4, v2, 1, v3, 0, 3, 5, 5, 3, 0];
 
         let v1 = program[3];
-        // let v2 = self.program[7];
-        let v3 = program[9];
+        let v3 = {
+            let mut ip = 4;
+            while ip < program.len() - 1 {
+                if program[ip] == 1 {
+                    break;
+                }
+                ip += 2;
+            }
+            program[ip + 1]
+        };
 
         Ok(Self { a, v1, v3, program })
     }

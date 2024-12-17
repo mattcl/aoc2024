@@ -354,7 +354,7 @@ fn collapse_forked_rejoin(graph: &mut Graph, i: usize, up_i: usize, dn_i: usize,
     }
 }
 
-fn best(graph: &Graph, seen_locations: &mut Vec<usize>) -> usize {
+fn best(graph: &Graph, seen_locations: &mut [usize]) -> usize {
     let mut heap = BinaryHeap::default();
 
     let start = SimpleState {
@@ -384,12 +384,6 @@ fn best(graph: &Graph, seen_locations: &mut Vec<usize>) -> usize {
             let next_cost = cost + edge.cost + if edge.enter_dir == facing { 1 } else { 1001 };
 
             let next_node = edge.to;
-
-            // if seen_locations[next_node] + 1000 < next_cost {
-            //     continue;
-            // }
-
-            // seen_locations[next_node] = next_cost;
 
             let next_state = SimpleState {
                 node: next_node,
@@ -454,11 +448,15 @@ fn all_paths(graph: &Graph, seen_locations: &mut [usize], min: usize) -> usize {
 
             let next_node = edge.to;
 
+            // do this inside, since it's much more costly to have to calculate
+            // the next state to put on the heap because of the edge array
             if seen_locations[next_node] + 1000 < next_cost {
                 continue;
             }
 
-            seen_locations[next_node] = next_cost;
+            if seen_locations[next_node] == usize::MAX - 2000 {
+                seen_locations[next_node] = next_cost;
+            }
 
             let mut new_path = path.clone();
             new_path.push(edge);

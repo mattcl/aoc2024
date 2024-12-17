@@ -1,4 +1,5 @@
-use std::{cmp::Ordering, collections::BinaryHeap, str::FromStr};
+use std::cmp::Ordering;
+use std::{collections::BinaryHeap, str::FromStr};
 
 use aoc_plumbing::Problem;
 use aoc_std::{collections::CharGrid, directions::Cardinal, geometry::Location};
@@ -57,14 +58,62 @@ impl FromStr for ReindeerMaze {
             bfs_junction(i, &grid, &mut graph, &mut cur, &mut next);
         }
 
-        // cool, now let's collapse nodes that only have 2 edges that are not
-        // the start and end nodes, and let's remove edges that lead to a dead
-        // end node.
+        // cool, now let's remove always-bad edges, nodes that only have 2 edges
+        // that are not the start and end nodes, and let's remove edges that
+        // lead to a dead end node.
         //
         // make two passes
         for _ in 0..2 {
             // start at 2 to avoid the start/end nodes
             for i in (2..graph.nodes.len()).rev() {
+                // remove dead-end nodes
+                if graph.nodes[i].edges.len() < 2 {
+                    remove_single_edge_nodes(&mut graph, i);
+                    continue;
+                }
+
+                // remove multiple paths to same destination, if able
+                if graph.nodes[i].edges.len() > 2 {
+                    'outer: for j in 0..graph.nodes[i].edges.len() {
+                        for k in (j + 1)..graph.nodes[i].edges.len() {
+                            if graph.nodes[i].edges[j].to == graph.nodes[i].edges[k].to {
+                                let left = graph.nodes[i].edges[j];
+                                let right = graph.nodes[i].edges[k];
+
+                                #[allow(clippy::comparison_chain)]
+                                if left.cost < right.cost {
+                                    graph.nodes[i].edges.remove(k);
+                                    graph.nodes[right.to].edges.retain(|e| {
+                                        e.to != i || e.exit_dir != right.enter_dir.opposite()
+                                    });
+                                    break 'outer;
+                                } else if right.cost < left.cost {
+                                    graph.nodes[i].edges.remove(j);
+                                    graph.nodes[left.to].edges.retain(|e| {
+                                        e.to != i || e.exit_dir != left.enter_dir.opposite()
+                                    });
+                                    break 'outer;
+                                } else {
+                                    graph.nodes[i].edges[j].distance += right.distance;
+                                    graph.nodes[i].edges.remove(k);
+                                    graph.nodes[right.to].edges.retain(|e| {
+                                        e.to != i || e.exit_dir != right.enter_dir.opposite()
+                                    });
+                                    if let Some(other) =
+                                        graph.nodes[right.to].edges.iter_mut().find(|e| {
+                                            e.to == i && e.exit_dir == left.enter_dir.opposite()
+                                        })
+                                    {
+                                        other.distance += right.distance;
+                                    }
+                                    break 'outer;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // remove join the edges of nodes that are effectively corridors
                 if graph.nodes[i].edges.len() == 2 {
                     let left = graph.nodes[i].edges[0];
                     let right = graph.nodes[i].edges[1];
@@ -102,10 +151,6 @@ impl FromStr for ReindeerMaze {
                             break;
                         }
                     }
-                } else if graph.nodes[i].edges.len() == 1 {
-                    let to = graph.nodes[i].edges[0].to;
-                    graph.nodes[to].edges.retain(|e| e.to != i);
-                    graph.nodes[i].edges.clear();
                 }
             }
         }
@@ -137,86 +182,11 @@ impl FromStr for ReindeerMaze {
         }
 
         // okay, now we can solve both parts, i guess
-        let mut heap = BinaryHeap::default();
         let mut seen_locations = vec![usize::MAX - 2000; graph.nodes.len()];
-        let mut min = usize::MAX;
-
         seen_locations[0] = 0;
+        let min = best(&graph, &mut seen_locations);
 
-        let start = State {
-            node: 0,
-            cost: 0,
-            facing: Cardinal::East,
-            path: Vec::default(),
-        };
-
-        heap.push(start);
-
-        let mut unique: FxHashSet<(usize, usize)> =
-            FxHashSet::with_capacity_and_hasher(1000, rustc_hash::FxBuildHasher);
-        let mut unique_junctions: Vec<bool> = vec![false; graph.nodes.len()];
-
-        let mut total_dist = 0;
-
-        while let Some(State {
-            node,
-            cost,
-            facing,
-            path,
-        }) = heap.pop()
-        {
-            if node == 1 {
-                if cost > min {
-                    break;
-                }
-
-                min = cost;
-
-                for edge in path.iter() {
-                    if unique.insert(edge.unique_id()) {
-                        unique_junctions[edge.from] = true;
-                        unique_junctions[edge.to] = true;
-                        total_dist += edge.distance;
-                    }
-                }
-
-                continue;
-            }
-
-            for edge in graph.nodes[node].edges.iter() {
-                if edge.enter_dir.opposite() == facing {
-                    continue;
-                }
-
-                if edge.to != 1 && graph.nodes[edge.to].edges.len() < 2 {
-                    continue;
-                }
-
-                let next_cost = cost + edge.cost + if edge.enter_dir == facing { 1 } else { 1001 };
-
-                let next_node = edge.to;
-
-                if seen_locations[next_node] + 1001 < next_cost {
-                    continue;
-                }
-
-                seen_locations[next_node] = next_cost;
-
-                let mut new_path = path.clone();
-                new_path.push(edge);
-
-                let next_state = State {
-                    node: next_node,
-                    cost: next_cost,
-                    facing: edge.exit_dir,
-                    path: new_path,
-                };
-
-                heap.push(next_state);
-            }
-        }
-
-        total_dist += unique_junctions.iter().filter(|v| **v).count();
+        let total_dist = all_paths(&graph, &mut seen_locations, min);
 
         Ok(Self {
             p1: min,
@@ -292,6 +262,15 @@ fn bfs_junction(
         cur.clear();
 
         std::mem::swap(cur, next);
+    }
+}
+
+fn remove_single_edge_nodes(graph: &mut Graph, i: usize) {
+    if graph.nodes[i].edges.len() == 1 {
+        let to = graph.nodes[i].edges[0].to;
+        graph.nodes[to].edges.retain(|e| e.to != i);
+        graph.nodes[i].edges.clear();
+        remove_single_edge_nodes(graph, to);
     }
 }
 
@@ -375,6 +354,129 @@ fn collapse_forked_rejoin(graph: &mut Graph, i: usize, up_i: usize, dn_i: usize,
     }
 }
 
+fn best(graph: &Graph, seen_locations: &mut Vec<usize>) -> usize {
+    let mut heap = BinaryHeap::default();
+
+    let start = SimpleState {
+        node: 0,
+        facing: Cardinal::East,
+        cost: 0,
+    };
+
+    heap.push(start);
+
+    while let Some(SimpleState { node, facing, cost }) = heap.pop() {
+        if node == 1 {
+            return cost;
+        }
+
+        if seen_locations[node] < cost {
+            continue;
+        }
+
+        seen_locations[node] = cost;
+
+        for edge in graph.nodes[node].edges.iter() {
+            if edge.enter_dir.opposite() == facing {
+                continue;
+            }
+
+            let next_cost = cost + edge.cost + if edge.enter_dir == facing { 1 } else { 1001 };
+
+            let next_node = edge.to;
+
+            // if seen_locations[next_node] + 1000 < next_cost {
+            //     continue;
+            // }
+
+            // seen_locations[next_node] = next_cost;
+
+            let next_state = SimpleState {
+                node: next_node,
+                cost: next_cost,
+                facing: edge.exit_dir,
+            };
+
+            heap.push(next_state);
+        }
+    }
+
+    0
+}
+
+fn all_paths(graph: &Graph, seen_locations: &mut [usize], min: usize) -> usize {
+    let mut heap = BinaryHeap::default();
+
+    let start = State {
+        node: 0,
+        cost: 0,
+        facing: Cardinal::East,
+        path: Vec::default(),
+    };
+
+    heap.push(start);
+
+    let mut unique: FxHashSet<(usize, usize)> =
+        FxHashSet::with_capacity_and_hasher(1000, rustc_hash::FxBuildHasher);
+    let mut unique_junctions: Vec<bool> = vec![false; graph.nodes.len()];
+
+    let mut total_dist = 0;
+
+    while let Some(State {
+        node,
+        cost,
+        facing,
+        path,
+    }) = heap.pop()
+    {
+        if node == 1 {
+            if cost > min {
+                break;
+            }
+
+            for edge in path.iter() {
+                if unique.insert(edge.unique_id()) {
+                    unique_junctions[edge.from] = true;
+                    unique_junctions[edge.to] = true;
+                    total_dist += edge.distance;
+                }
+            }
+
+            continue;
+        }
+
+        for edge in graph.nodes[node].edges.iter() {
+            if edge.enter_dir.opposite() == facing {
+                continue;
+            }
+
+            let next_cost = cost + edge.cost + if edge.enter_dir == facing { 1 } else { 1001 };
+
+            let next_node = edge.to;
+
+            if seen_locations[next_node] + 1000 < next_cost {
+                continue;
+            }
+
+            seen_locations[next_node] = next_cost;
+
+            let mut new_path = path.clone();
+            new_path.push(edge);
+
+            let next_state = State {
+                node: next_node,
+                cost: next_cost,
+                facing: edge.exit_dir,
+                path: new_path,
+            };
+
+            heap.push(next_state);
+        }
+    }
+
+    total_dist + unique_junctions.iter().filter(|v| **v).count()
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct Graph {
     node_map: FxHashMap<Location, usize>,
@@ -435,6 +537,28 @@ impl Problem for ReindeerMaze {
 
     fn part_two(&mut self) -> Result<Self::P2, Self::ProblemError> {
         Ok(self.p2)
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+struct SimpleState {
+    node: usize,
+    facing: Cardinal,
+    cost: usize,
+}
+
+impl Ord for SimpleState {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other
+            .cost
+            .cmp(&self.cost)
+            .then_with(|| self.node.cmp(&other.node))
+    }
+}
+
+impl PartialOrd for SimpleState {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 

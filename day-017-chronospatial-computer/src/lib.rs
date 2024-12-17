@@ -72,7 +72,6 @@ impl Problem for ChronospatialComputer {
 
         cur.push(0);
 
-        let mut maxlen = 0;
         for wanted in self.program.iter().rev() {
             for p in cur.drain(..) {
                 for i in 0_u64..8 {
@@ -83,9 +82,6 @@ impl Problem for ChronospatialComputer {
                 }
             }
             std::mem::swap(&mut cur, &mut next);
-            if cur.len() > maxlen {
-                maxlen = cur.len();
-            }
         }
 
         cur.sort();

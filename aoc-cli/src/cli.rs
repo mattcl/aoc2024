@@ -7,6 +7,7 @@ use anyhow::{Context, Result};
 use aoc_plumbing::Problem;
 use bridge_repair::BridgeRepair;
 use ceres_search::CeresSearch;
+use chronospatial_computer::ChronospatialComputer;
 use clap::{Args, CommandFactory, Parser, Subcommand};
 use clap_complete::{generate, shells::Zsh};
 use claw_contraption::ClawContraption;
@@ -196,5 +197,6 @@ generate_cli! {
     (RestroomRedoubt, 14),
     (WarehouseWoes, 15),
     (ReindeerMaze, 16),
+    (ChronospatialComputer, 17),
     // command_marker
 }

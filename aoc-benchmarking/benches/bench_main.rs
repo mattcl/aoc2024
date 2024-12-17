@@ -3,6 +3,7 @@ use criterion::criterion_main;
 use aoc_benchmarking::aoc_benches;
 use bridge_repair::BridgeRepair;
 use ceres_search::CeresSearch;
+use chronospatial_computer::ChronospatialComputer;
 use claw_contraption::ClawContraption;
 use disk_fragmenter::DiskFragmenter;
 use garden_groups::GardenGroups;
@@ -125,6 +126,13 @@ aoc_benches! {
         "../day-016-reindeer-maze/input.txt",
         ReindeerMaze,
         "Combined"
+    ),
+    (
+        day_017,
+        "../day-017-chronospatial-computer/input.txt",
+        ChronospatialComputer,
+        "Part 1",
+        "Part 2"
     ),
     // bench_marker
 }

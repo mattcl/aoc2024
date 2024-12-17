@@ -97,6 +97,7 @@ dependencies = [
  "aoc-plumbing",
  "bridge-repair",
  "ceres-search",
+ "chronospatial-computer",
  "claw-contraption",
  "criterion",
  "disk-fragmenter",
@@ -116,12 +117,13 @@ dependencies = [
 
 [[package]]
 name = "aoc-cli"
-version = "0.16.1"
+version = "0.17.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
  "bridge-repair",
  "ceres-search",
+ "chronospatial-computer",
  "clap",
  "clap_complete",
  "claw-contraption",
@@ -362,6 +364,19 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
+name = "chronospatial-computer"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-plumbing",
+ "aoc-std",
+ "itertools 0.13.0",
+ "nom",
+ "rustc-hash",
+ "serde",
+]
 
 [[package]]
 name = "ciborium"

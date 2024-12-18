@@ -56,9 +56,12 @@ impl<const N: usize> FromStr for RamRunGen<N> {
 
         // okay, let's binary search through the remaining configurations until
         // we find the one we want
+        //
+        // for my input, this only has to perform 11 pathfinding checks
         let mut left = 0;
         let mut right = remaining.len();
         let mut cur_grid = grid.clone();
+        let mut orig_grid_idx = 0;
 
         while left < right {
             let cur_idx = (left + right) / 2;
@@ -83,16 +86,19 @@ impl<const N: usize> FromStr for RamRunGen<N> {
             match res {
                 DijkstraResult::Success { .. } => {
                     left = cur_idx + 1;
+                    // update the original grid to catch up to this point
+                    for (c, r) in &remaining[orig_grid_idx..=left] {
+                        let byte_mask = 1 << (c + 1);
+                        grid[*r as usize + 1] |= byte_mask;
+                    }
+                    orig_grid_idx = left;
                 }
                 DijkstraResult::NoPath { .. } => {
                     right = cur_idx;
 
-                    // reset the grid to up to the left bound
+                    // reset the grid to up to the left bound (which will be
+                    // the modified original grid after a few updates)
                     cur_grid = grid.clone();
-                    for (c, r) in &remaining[..=left] {
-                        let byte_mask = 1 << (c + 1);
-                        cur_grid[*r as usize + 1] |= byte_mask;
-                    }
                 }
             }
         }

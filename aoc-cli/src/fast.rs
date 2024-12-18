@@ -3,6 +3,7 @@ use std::env;
 use aoc_plumbing::Problem;
 use bridge_repair::BridgeRepair;
 use ceres_search::CeresSearch;
+use chronospatial_computer::ChronospatialComputer;
 use claw_contraption::ClawContraption;
 use disk_fragmenter::DiskFragmenter;
 use garden_groups::GardenGroups;
@@ -12,9 +13,12 @@ use hoof_it::HoofIt;
 use mull_it_over::MullItOver;
 use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
+use ram_run::RamRun;
 use red_nosed_reports::RedNosedReports;
+use reindeer_maze::ReindeerMaze;
 use resonant_collinearity::ResonantCollinearity;
 use restroom_redoubt::RestroomRedoubt;
+use warehouse_woes::WarehouseWoes;
 
 pub fn run() -> anyhow::Result<()> {
     let day: u8 = env::var("AOC_DAY")?.parse()?;
@@ -36,6 +40,10 @@ pub fn run() -> anyhow::Result<()> {
         12 => serde_json::to_string(&GardenGroups::solve(&input)?)?,
         13 => serde_json::to_string(&ClawContraption::solve(&input)?)?,
         14 => serde_json::to_string(&RestroomRedoubt::solve(&input)?)?,
+        15 => serde_json::to_string(&WarehouseWoes::solve(&input)?)?,
+        16 => serde_json::to_string(&ReindeerMaze::solve(&input)?)?,
+        17 => serde_json::to_string(&ChronospatialComputer::solve(&input)?)?,
+        18 => serde_json::to_string(&RamRun::solve(&input)?)?,
         _ => "\"not implemented\"".into(),
     };
 

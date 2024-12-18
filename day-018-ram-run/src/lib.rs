@@ -7,12 +7,12 @@ use aoc_std::{
 };
 
 #[derive(Debug, Clone)]
-pub struct RamRunGen<const N: usize> {
+pub struct RamRunGen<const N: usize, const M: usize> {
     p1: i64,
     p2: (u8, u8),
 }
 
-impl<const N: usize> FromStr for RamRunGen<N> {
+impl<const N: usize, const M: usize> FromStr for RamRunGen<N, M> {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -21,7 +21,7 @@ impl<const N: usize> FromStr for RamRunGen<N> {
         let initial: u128 = 1 << (N + 1) | 1;
 
         // make this larger than we need and put a "wall" around the grid
-        let mut grid = vec![initial; N + 2];
+        let mut grid = [initial; M]; // we dont have const generic expressions in stable
         grid[0] = u128::MAX;
         grid[N + 1] = u128::MAX;
 
@@ -60,7 +60,7 @@ impl<const N: usize> FromStr for RamRunGen<N> {
         // for my input, this only has to perform 11 pathfinding checks
         let mut left = 0;
         let mut right = remaining.len();
-        let mut cur_grid = grid.clone();
+        let mut cur_grid = grid;
         let mut orig_grid_idx = 0;
 
         while left < right {
@@ -98,7 +98,7 @@ impl<const N: usize> FromStr for RamRunGen<N> {
 
                     // reset the grid to up to the left bound (which will be
                     // the modified original grid after a few updates)
-                    cur_grid = grid.clone();
+                    cur_grid = grid;
                 }
             }
         }
@@ -110,7 +110,7 @@ impl<const N: usize> FromStr for RamRunGen<N> {
     }
 }
 
-impl<const N: usize> Problem for RamRunGen<N> {
+impl<const N: usize, const M: usize> Problem for RamRunGen<N, M> {
     const DAY: usize = 18;
     const TITLE: &'static str = "ram run";
     const README: &'static str = include_str!("../README.md");
@@ -128,7 +128,7 @@ impl<const N: usize> Problem for RamRunGen<N> {
     }
 }
 
-pub type RamRun = RamRunGen<71>;
+pub type RamRun = RamRunGen<71, 73>;
 
 #[cfg(test)]
 mod tests {
@@ -171,7 +171,7 @@ mod tests {
 0,5
 1,6
 2,0";
-        let solution = RamRunGen::<7>::solve(input).unwrap();
+        let solution = RamRunGen::<7, 9>::solve(input).unwrap();
         assert_eq!(solution, Solution::new(22, "6,1".into()));
     }
 }

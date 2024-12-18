@@ -30,3 +30,4 @@ restroom-redoubt = { path = "../day-014-restroom-redoubt" }
 warehouse-woes = { path = "../day-015-warehouse-woes" }
 reindeer-maze = { path = "../day-016-reindeer-maze" }
 chronospatial-computer = { path = "../day-017-chronospatial-computer" }
+ram-run = { path = "../day-018-ram-run" }

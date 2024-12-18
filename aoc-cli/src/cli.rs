@@ -19,6 +19,7 @@ use hoof_it::HoofIt;
 use mull_it_over::MullItOver;
 use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
+use ram_run::RamRun;
 use red_nosed_reports::RedNosedReports;
 use reindeer_maze::ReindeerMaze;
 use resonant_collinearity::ResonantCollinearity;
@@ -198,5 +199,6 @@ generate_cli! {
     (WarehouseWoes, 15),
     (ReindeerMaze, 16),
     (ChronospatialComputer, 17),
+    (RamRun, 18),
     // command_marker
 }

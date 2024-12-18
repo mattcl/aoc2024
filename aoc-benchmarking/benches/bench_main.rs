@@ -13,6 +13,7 @@ use hoof_it::HoofIt;
 use mull_it_over::MullItOver;
 use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
+use ram_run::RamRun;
 use red_nosed_reports::RedNosedReports;
 use reindeer_maze::ReindeerMaze;
 use resonant_collinearity::ResonantCollinearity;
@@ -133,6 +134,12 @@ aoc_benches! {
         ChronospatialComputer,
         "Part 1",
         "Part 2"
+    ),
+    (
+        day_018,
+        "../day-018-ram-run/input.txt",
+        RamRun,
+        "Combined"
     ),
     // bench_marker
 }

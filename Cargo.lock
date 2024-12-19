@@ -105,6 +105,7 @@ dependencies = [
  "guard-gallivant",
  "historian-hysteria",
  "hoof-it",
+ "linen-layout",
  "mull-it-over",
  "plutonium-pebbles",
  "print-queue",
@@ -118,7 +119,7 @@ dependencies = [
 
 [[package]]
 name = "aoc-cli"
-version = "0.18.1"
+version = "0.19.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
@@ -133,6 +134,7 @@ dependencies = [
  "guard-gallivant",
  "historian-hysteria",
  "hoof-it",
+ "linen-layout",
  "mull-it-over",
  "plutonium-pebbles",
  "print-queue",
@@ -808,6 +810,20 @@ name = "libm"
 version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8355be11b20d696c8f18f6cc018c4e372165b1fa8126cef092399c9951984ffa"
+
+[[package]]
+name = "linen-layout"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-plumbing",
+ "aoc-std",
+ "nom",
+ "rayon",
+ "rustc-hash",
+ "serde",
+ "xxhash-rust",
+]
 
 [[package]]
 name = "linux-raw-sys"

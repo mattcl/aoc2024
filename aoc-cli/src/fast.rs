@@ -10,6 +10,7 @@ use garden_groups::GardenGroups;
 use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
 use hoof_it::HoofIt;
+use linen_layout::LinenLayout;
 use mull_it_over::MullItOver;
 use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
@@ -44,6 +45,7 @@ pub fn run() -> anyhow::Result<()> {
         16 => serde_json::to_string(&ReindeerMaze::solve(&input)?)?,
         17 => serde_json::to_string(&ChronospatialComputer::solve(&input)?)?,
         18 => serde_json::to_string(&RamRun::solve(&input)?)?,
+        19 => serde_json::to_string(&LinenLayout::solve(&input)?)?,
         _ => "\"not implemented\"".into(),
     };
 

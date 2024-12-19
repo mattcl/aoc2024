@@ -52,7 +52,23 @@ impl<const N: usize, const M: usize> FromStr for RamRunGen<N, M> {
 
         let p1 = res.cost()?;
 
-        let remaining: Vec<(u8, u8)> = iter.collect();
+        // let remaining: Vec<(u8, u8)> = iter.collect();
+
+        // let's exploit the way the input was _probably_ generated
+        let mut remaining = Vec::with_capacity(2000);
+
+        for (c, r) in iter {
+            // these locations could never be on the path because of the way
+            // you'd probably generate a maze by creating a connected set of
+            // cells and then filling in walls between them. The odd-numbered
+            // rows would be "wall" with gaps joining the connected cells.
+            if r % 2 == 1 && c % 2 == 1 {
+                let byte_mask = 1 << (c + 1);
+                grid[r as usize + 1] |= byte_mask;
+            } else {
+                remaining.push((c, r));
+            }
+        }
 
         // okay, let's binary search through the remaining configurations until
         // we find the one we want
@@ -107,6 +123,10 @@ impl<const N: usize, const M: usize> FromStr for RamRunGen<N, M> {
             p1,
             p2: remaining[left],
         })
+        // Ok(Self {
+        //     p1,
+        //     p2,
+        // })
     }
 }
 

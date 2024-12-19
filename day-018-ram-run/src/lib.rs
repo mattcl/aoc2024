@@ -79,43 +79,68 @@ impl<const N: usize, const M: usize> FromStr for RamRunGen<N, M> {
         let mut cur_grid = grid;
         let mut orig_grid_idx = 0;
 
+        let mut cur_path = [0_u128; M];
+        let mut needs_research = false;
+
+        for loc in res.path()? {
+            cur_path[loc.row] |= 1 << loc.col;
+        }
+
         while left < right {
             let cur_idx = (left + right) / 2;
 
             for (c, r) in &remaining[left..=cur_idx] {
                 let byte_mask = 1 << (c + 1);
                 cur_grid[*r as usize + 1] |= byte_mask;
+                if cur_path[*r as usize + 1] & byte_mask != 0 {
+                    cur_path = [0_u128; M];
+                    needs_research = true;
+                }
             }
 
-            let res = dijkstra(
-                &start,
-                &mut |loc| {
-                    loc.cardinal_neighbors()
-                        .filter(|(_, nloc)| {
-                            let mask = 1 << (nloc.col);
-                            cur_grid[nloc.row] & mask == 0
-                        })
-                        .map(|(_dir, nloc)| (nloc, 1))
-                },
-                &mut |n| n == &end,
-            );
-            match res {
-                DijkstraResult::Success { .. } => {
-                    left = cur_idx + 1;
-                    // update the original grid to catch up to this point
-                    for (c, r) in &remaining[orig_grid_idx..=left] {
-                        let byte_mask = 1 << (c + 1);
-                        grid[*r as usize + 1] |= byte_mask;
-                    }
-                    orig_grid_idx = left;
-                }
-                DijkstraResult::NoPath { .. } => {
-                    right = cur_idx;
+            if needs_research {
+                let res = dijkstra(
+                    &start,
+                    &mut |loc| {
+                        loc.cardinal_neighbors()
+                            .filter(|(_, nloc)| {
+                                let mask = 1 << (nloc.col);
+                                cur_grid[nloc.row] & mask == 0
+                            })
+                            .map(|(_dir, nloc)| (nloc, 1))
+                    },
+                    &mut |n| n == &end,
+                );
+                match res {
+                    a @ DijkstraResult::Success { .. } => {
+                        left = cur_idx + 1;
 
-                    // reset the grid to up to the left bound (which will be
-                    // the modified original grid after a few updates)
-                    cur_grid = grid;
+                        for loc in a.path()? {
+                            cur_path[loc.row] |= 1 << loc.col;
+                        }
+                        needs_research = false;
+                        // update the original grid to catch up to this point
+                        for (c, r) in &remaining[orig_grid_idx..=left] {
+                            let byte_mask = 1 << (c + 1);
+                            grid[*r as usize + 1] |= byte_mask;
+                        }
+                        orig_grid_idx = left;
+                    }
+                    DijkstraResult::NoPath { .. } => {
+                        right = cur_idx;
+
+                        // reset the grid to up to the left bound (which will be
+                        // the modified original grid after a few updates)
+                        cur_grid = grid;
+                    }
                 }
+            } else {
+                left = cur_idx + 1;
+                for (c, r) in &remaining[orig_grid_idx..=left] {
+                    let byte_mask = 1 << (c + 1);
+                    grid[*r as usize + 1] |= byte_mask;
+                }
+                orig_grid_idx = left;
             }
         }
 
@@ -123,10 +148,6 @@ impl<const N: usize, const M: usize> FromStr for RamRunGen<N, M> {
             p1,
             p2: remaining[left],
         })
-        // Ok(Self {
-        //     p1,
-        //     p2,
-        // })
     }
 }
 

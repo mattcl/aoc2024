@@ -20,6 +20,7 @@ use linen_layout::LinenLayout;
 use mull_it_over::MullItOver;
 use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
+use race_condition::RaceCondition;
 use ram_run::RamRun;
 use red_nosed_reports::RedNosedReports;
 use reindeer_maze::ReindeerMaze;
@@ -202,5 +203,6 @@ generate_cli! {
     (ChronospatialComputer, 17),
     (RamRun, 18),
     (LinenLayout, 19),
+    (RaceCondition, 20),
     // command_marker
 }

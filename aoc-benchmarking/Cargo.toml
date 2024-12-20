@@ -32,3 +32,4 @@ reindeer-maze = { path = "../day-016-reindeer-maze" }
 chronospatial-computer = { path = "../day-017-chronospatial-computer" }
 ram-run = { path = "../day-018-ram-run" }
 linen-layout = { path = "../day-019-linen-layout" }
+race-condition = { path = "../day-020-race-condition" }

@@ -2,10 +2,7 @@ use std::str::FromStr;
 
 use anyhow::anyhow;
 use aoc_plumbing::Problem;
-use aoc_std::{
-    conversions::chars::ascii_lowercase_alpha_to_num,
-    geometry::Point2D,
-};
+use aoc_std::{conversions::chars::ascii_lowercase_alpha_to_num, geometry::Point2D};
 use rayon::prelude::*;
 use rustc_hash::FxHashSet;
 

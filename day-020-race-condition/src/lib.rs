@@ -74,7 +74,7 @@ impl<const N: i32> FromStr for RaceConditionGen<N> {
                             p1 += 1;
                         }
                         p2 += 1;
-                    } else if dist > 21 {
+                    } else if dist > 20 {
                         // we know that we can jump ahead by at least this much
                         j += dist as usize - 20;
                         continue;

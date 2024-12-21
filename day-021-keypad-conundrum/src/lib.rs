@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{rc::Rc, str::FromStr};
 
 use aoc_plumbing::Problem;
 use aoc_std::geometry::Point2D;
@@ -65,6 +65,10 @@ const fn direction(ch: u8) -> Point2D<i8> {
     }
 }
 
+// Since it's static once created, the Rc will let us avoid cloning the actual
+// path list, which would be expensive relative to the runtime
+pub type PathCache = FxHashMap<(Point2D<i8>, Point2D<i8>), Rc<Vec<Vec<u8>>>>;
+
 #[derive(Debug, Clone)]
 pub struct KeypadConundrum {
     p1: usize,
@@ -76,14 +80,32 @@ impl FromStr for KeypadConundrum {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut cache = FxHashMap::with_capacity_and_hasher(1000, rustc_hash::FxBuildHasher);
+        let mut digit_cache = FxHashMap::with_capacity_and_hasher(1000, rustc_hash::FxBuildHasher);
+        let mut nav_cache = FxHashMap::with_capacity_and_hasher(1000, rustc_hash::FxBuildHasher);
 
         let mut p1 = 0;
         let mut p2 = 0;
 
         for line in s.trim().lines() {
             let val: usize = line[..3].parse()?;
-            p1 += val * min_path(line.as_bytes(), 0, 2, &mut cache);
-            p2 += val * min_path(line.as_bytes(), 0, 25, &mut cache);
+            p1 += val
+                * min_path(
+                    line.as_bytes(),
+                    0,
+                    2,
+                    &mut cache,
+                    &mut digit_cache,
+                    &mut nav_cache,
+                );
+            p2 += val
+                * min_path(
+                    line.as_bytes(),
+                    0,
+                    25,
+                    &mut cache,
+                    &mut digit_cache,
+                    &mut nav_cache,
+                );
         }
 
         Ok(Self { p1, p2 })
@@ -108,7 +130,11 @@ impl Problem for KeypadConundrum {
     }
 }
 
-fn digit_paths(from: Point2D<i8>, to: Point2D<i8>) -> Vec<Vec<u8>> {
+fn digit_paths(from: Point2D<i8>, to: Point2D<i8>, cache: &mut PathCache) -> Rc<Vec<Vec<u8>>> {
+    if let Some(cached) = cache.get(&(from, to)) {
+        return cached.clone();
+    }
+
     let slope = to - from;
 
     let mut out = match slope.y.signum() {
@@ -126,7 +152,7 @@ fn digit_paths(from: Point2D<i8>, to: Point2D<i8>) -> Vec<Vec<u8>> {
 
     let len = out.len();
 
-    let filtered: Vec<Vec<u8>> = out
+    let mut filtered: Vec<Vec<u8>> = out
         .into_iter()
         .permutations(len)
         .unique()
@@ -147,13 +173,21 @@ fn digit_paths(from: Point2D<i8>, to: Point2D<i8>) -> Vec<Vec<u8>> {
         .collect();
 
     if filtered.is_empty() {
-        return vec![vec![b'A']];
+        filtered.push(vec![b'A']);
     }
 
-    filtered
+    let referenced = Rc::new(filtered);
+
+    cache.insert((from, to), referenced.clone());
+
+    referenced
 }
 
-fn nav_paths(from: Point2D<i8>, to: Point2D<i8>) -> Vec<Vec<u8>> {
+fn nav_paths(from: Point2D<i8>, to: Point2D<i8>, cache: &mut PathCache) -> Rc<Vec<Vec<u8>>> {
+    if let Some(cached) = cache.get(&(from, to)) {
+        return cached.clone();
+    }
+
     let slope = to - from;
 
     let mut out = match slope.y.signum() {
@@ -171,7 +205,7 @@ fn nav_paths(from: Point2D<i8>, to: Point2D<i8>) -> Vec<Vec<u8>> {
 
     let len = out.len();
 
-    let filtered: Vec<Vec<u8>> = out
+    let mut filtered: Vec<Vec<u8>> = out
         .into_iter()
         .permutations(len)
         .unique()
@@ -192,10 +226,14 @@ fn nav_paths(from: Point2D<i8>, to: Point2D<i8>) -> Vec<Vec<u8>> {
         .collect();
 
     if filtered.is_empty() {
-        return vec![vec![b'A']];
+        filtered.push(vec![b'A']);
     }
 
-    filtered
+    let referenced = Rc::new(filtered);
+
+    cache.insert((from, to), referenced.clone());
+
+    referenced
 }
 
 fn min_path(
@@ -203,6 +241,8 @@ fn min_path(
     depth: u8,
     max_depth: u8,
     cache: &mut FxHashMap<(u64, u8, u8), usize>,
+    digit_cache: &mut PathCache,
+    nav_cache: &mut PathCache,
 ) -> usize {
     let key = (xxh3_64(seq), depth, max_depth);
 
@@ -215,10 +255,10 @@ fn min_path(
         let mut cur = digit_pos(b'A');
         for ch in seq {
             let next = digit_pos(*ch);
-            let paths = digit_paths(cur, next);
+            let paths = digit_paths(cur, next, digit_cache);
             len += paths
-                .into_iter()
-                .map(|p| min_path(&p, depth + 1, max_depth, cache))
+                .iter()
+                .map(|p| min_path(p, depth + 1, max_depth, cache, digit_cache, nav_cache))
                 .min()
                 .unwrap_or_default();
 
@@ -228,13 +268,13 @@ fn min_path(
         let mut cur = nav_pos(b'A');
         for ch in seq {
             let next = nav_pos(*ch);
-            let paths = nav_paths(cur, next);
+            let paths = nav_paths(cur, next, nav_cache);
             if depth == max_depth {
                 len += paths[0].len().max(1);
             } else {
                 len += paths
-                    .into_iter()
-                    .map(|p| min_path(&p, depth + 1, max_depth, cache))
+                    .iter()
+                    .map(|p| min_path(p, depth + 1, max_depth, cache, digit_cache, nav_cache))
                     .min()
                     .unwrap_or_default();
             }

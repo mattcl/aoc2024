@@ -405,7 +405,7 @@ fn all_paths(graph: &Graph, seen_locations: &mut [usize], min: usize) -> usize {
         node: 0,
         cost: 0,
         facing: Cardinal::East,
-        path: Vec::default(),
+        link: usize::MAX,
     };
 
     heap.push(start);
@@ -413,6 +413,7 @@ fn all_paths(graph: &Graph, seen_locations: &mut [usize], min: usize) -> usize {
     let mut unique: FxHashSet<(usize, usize)> =
         FxHashSet::with_capacity_and_hasher(1000, rustc_hash::FxBuildHasher);
     let mut unique_junctions: Vec<bool> = vec![false; graph.nodes.len()];
+    let mut state_links: Vec<StateLink> = Vec::with_capacity(5000);
 
     let mut total_dist = 0;
 
@@ -420,7 +421,7 @@ fn all_paths(graph: &Graph, seen_locations: &mut [usize], min: usize) -> usize {
         node,
         cost,
         facing,
-        path,
+        link,
     }) = heap.pop()
     {
         if node == 1 {
@@ -428,12 +429,15 @@ fn all_paths(graph: &Graph, seen_locations: &mut [usize], min: usize) -> usize {
                 break;
             }
 
-            for edge in path.iter() {
+            let mut cur_link = link;
+            while cur_link != usize::MAX {
+                let edge = state_links[cur_link].edge;
                 if unique.insert(edge.unique_id()) {
                     unique_junctions[edge.from] = true;
                     unique_junctions[edge.to] = true;
                     total_dist += edge.distance;
                 }
+                cur_link = state_links[cur_link].prev;
             }
 
             continue;
@@ -458,14 +462,20 @@ fn all_paths(graph: &Graph, seen_locations: &mut [usize], min: usize) -> usize {
                 seen_locations[next_node] = next_cost;
             }
 
-            let mut new_path = path.clone();
-            new_path.push(edge);
+            // we can do this pseudo linked-list using the state_links arena
+            // instead of having to maintain a list (and clone that list) for
+            // each new state.
+            let new_link = StateLink { edge, prev: link };
+
+            let new_link_idx = state_links.len();
+
+            state_links.push(new_link);
 
             let next_state = State {
                 node: next_node,
                 cost: next_cost,
                 facing: edge.exit_dir,
-                path: new_path,
+                link: new_link_idx,
             };
 
             heap.push(next_state);
@@ -560,15 +570,15 @@ impl PartialOrd for SimpleState {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-struct State<'a> {
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+struct State {
     node: usize,
     cost: usize,
     facing: Cardinal,
-    path: Vec<&'a Edge>,
+    link: usize,
 }
 
-impl Ord for State<'_> {
+impl Ord for State {
     fn cmp(&self, other: &Self) -> Ordering {
         other
             .cost
@@ -577,10 +587,16 @@ impl Ord for State<'_> {
     }
 }
 
-impl PartialOrd for State<'_> {
+impl PartialOrd for State {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct StateLink<'a> {
+    edge: &'a Edge,
+    prev: usize,
 }
 
 #[cfg(test)]

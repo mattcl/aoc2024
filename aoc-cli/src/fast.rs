@@ -10,6 +10,7 @@ use garden_groups::GardenGroups;
 use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
 use hoof_it::HoofIt;
+use keypad_conundrum::KeypadConundrum;
 use linen_layout::LinenLayout;
 use mull_it_over::MullItOver;
 use plutonium_pebbles::PlutoniumPebbles;
@@ -48,6 +49,7 @@ pub fn run() -> anyhow::Result<()> {
         18 => serde_json::to_string(&RamRun::solve(&input)?)?,
         19 => serde_json::to_string(&LinenLayout::solve(&input)?)?,
         20 => serde_json::to_string(&RaceCondition::solve(&input)?)?,
+        21 => serde_json::to_string(&KeypadConundrum::solve(&input)?)?,
         _ => "\"not implemented\"".into(),
     };
 

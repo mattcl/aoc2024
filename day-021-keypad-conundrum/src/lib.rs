@@ -23,13 +23,6 @@ use xxhash_rust::xxh3::xxh3_64;
 // 0b1101 <
 // 0b1110 >
 
-const DIGITS: &[[u8; 3]] = &[
-    [b'7', b'8', b'9'],
-    [b'4', b'5', b'6'],
-    [b'1', b'2', b'3'],
-    [b'.', b'0', b'A'],
-];
-
 const DIGIT_HOLE: Point2D<i8> = Point2D { x: 0, y: 3 };
 
 const fn digit_pos(digit: u8) -> Point2D<i8> {
@@ -48,8 +41,6 @@ const fn digit_pos(digit: u8) -> Point2D<i8> {
         _ => unreachable!(),
     }
 }
-
-const NAV: &[[u8; 3]] = &[[b'.', b'^', b'A'], [b'<', b'v', b'>']];
 
 const NAV_HOLE: Point2D<i8> = Point2D { x: 0, y: 0 };
 

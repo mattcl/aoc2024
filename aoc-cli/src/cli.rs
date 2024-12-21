@@ -16,6 +16,7 @@ use garden_groups::GardenGroups;
 use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
 use hoof_it::HoofIt;
+use keypad_conundrum::KeypadConundrum;
 use linen_layout::LinenLayout;
 use mull_it_over::MullItOver;
 use plutonium_pebbles::PlutoniumPebbles;
@@ -204,5 +205,6 @@ generate_cli! {
     (RamRun, 18),
     (LinenLayout, 19),
     (RaceCondition, 20),
+    (KeypadConundrum, 21),
     // command_marker
 }

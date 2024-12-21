@@ -10,6 +10,7 @@ use garden_groups::GardenGroups;
 use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
 use hoof_it::HoofIt;
+use keypad_conundrum::KeypadConundrum;
 use linen_layout::LinenLayout;
 use mull_it_over::MullItOver;
 use plutonium_pebbles::PlutoniumPebbles;
@@ -153,6 +154,12 @@ aoc_benches! {
         day_020,
         "../day-020-race-condition/input.txt",
         RaceCondition,
+        "Combined"
+    ),
+    (
+        day_021,
+        "../day-021-keypad-conundrum/input.txt",
+        KeypadConundrum,
         "Combined"
     ),
     // bench_marker

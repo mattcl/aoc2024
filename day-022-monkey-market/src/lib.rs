@@ -10,8 +10,8 @@ use rayon::prelude::*;
 
 // N % 16,777,216 is equal to N & MOD_MASK;
 const MOD_MASK: u64 = (1 << 24) - 1;
-
 const SEQ_MASK: usize = (1 << 20) - 1;
+const DESIRED_CHUNKS: usize = 4;
 
 #[derive(Debug, Clone)]
 pub struct MonkeyMarket {
@@ -25,50 +25,41 @@ impl FromStr for MonkeyMarket {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (_, initial_numbers) = parse_numbers(s).map_err(|e| e.to_owned())?;
 
-        let mut working_set: Vec<(u64, Vec<(usize, u8)>)> = initial_numbers
-            .iter()
-            .map(|v| (*v, Vec::with_capacity(2000)))
-            .collect();
-
-        working_set.par_iter_mut().for_each(|(n, local_sequences)| {
-            let mut cur = *n;
-            let mut key: usize = 0;
-            let mut prev = (cur % 10) as i8;
-
-            for i in 0..2000 {
-                cur = next_number(cur);
-                let cur_digit = (cur % 10) as i8;
-                let delta: i8 = cur_digit - prev;
-                prev = cur_digit;
-                key = ((key << 5) & SEQ_MASK) | (delta + 10) as usize;
-
-                if i > 2 {
-                    local_sequences.push((key, cur_digit as u8));
-                }
-            }
-
-            *n = cur;
-        });
-
-        let chunk_size = (working_set.len() / 4) + if working_set.len() % 4 == 0 { 0 } else { 1 };
-
-        let (p1, p2, _totals) = working_set
+        let chunk_size = (initial_numbers.len() / DESIRED_CHUNKS)
+            + if initial_numbers.len() % DESIRED_CHUNKS == 0 {
+                0
+            } else {
+                1
+            };
+        let (p1, p2, _totals) = initial_numbers
             .par_chunks(chunk_size)
             .map(|chunk| {
                 let mut totals = vec![0_u16; 1 << 20];
                 let mut seen = vec![usize::MAX; 1 << 20];
                 let mut num_total = 0;
                 let mut best = 0;
-                for (i, (num, vals)) in chunk.iter().enumerate() {
-                    num_total += num;
-                    for (key, v) in vals.iter() {
-                        if seen[*key] != i {
-                            seen[*key] = i;
-                            totals[*key] += *v as u16;
-                            best = best.max(totals[*key])
+
+                for (i, n) in chunk.iter().enumerate() {
+                    let mut cur = *n;
+                    let mut key: usize = 0;
+                    let mut prev = (cur % 10) as i8;
+
+                    for j in 0..2000 {
+                        cur = next_number(cur);
+                        let cur_digit = (cur % 10) as i8;
+                        let delta: i8 = cur_digit - prev;
+                        prev = cur_digit;
+                        key = ((key << 5) & SEQ_MASK) | (delta + 10) as usize;
+
+                        if j > 2 && seen[key] != i {
+                            seen[key] = i;
+                            totals[key] += cur_digit as u16;
+                            best = best.max(totals[key])
                         }
                     }
+                    num_total += cur;
                 }
+
                 (num_total, best, totals)
             })
             .reduce(

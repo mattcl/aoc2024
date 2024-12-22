@@ -107,6 +107,7 @@ dependencies = [
  "hoof-it",
  "keypad-conundrum",
  "linen-layout",
+ "monkey-market",
  "mull-it-over",
  "plutonium-pebbles",
  "print-queue",
@@ -121,7 +122,7 @@ dependencies = [
 
 [[package]]
 name = "aoc-cli"
-version = "0.21.2"
+version = "0.22.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
@@ -138,6 +139,7 @@ dependencies = [
  "hoof-it",
  "keypad-conundrum",
  "linen-layout",
+ "monkey-market",
  "mull-it-over",
  "plutonium-pebbles",
  "print-queue",
@@ -889,6 +891,19 @@ name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
+
+[[package]]
+name = "monkey-market"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-plumbing",
+ "aoc-std",
+ "nom",
+ "rayon",
+ "rustc-hash",
+ "serde",
+]
 
 [[package]]
 name = "mull-it-over"

@@ -18,6 +18,7 @@ use historian_hysteria::HistorianHysteria;
 use hoof_it::HoofIt;
 use keypad_conundrum::KeypadConundrum;
 use linen_layout::LinenLayout;
+use monkey_market::MonkeyMarket;
 use mull_it_over::MullItOver;
 use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;
@@ -206,5 +207,6 @@ generate_cli! {
     (LinenLayout, 19),
     (RaceCondition, 20),
     (KeypadConundrum, 21),
+    (MonkeyMarket, 22),
     // command_marker
 }

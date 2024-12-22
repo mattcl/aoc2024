@@ -1,6 +1,6 @@
 [package]
 name = "aoc-cli"
-version = "0.21.2"
+version = "0.22.0"
 authors = ["Matt Chun-Lum <matt@questionable.engineering>"]
 edition = "2021"
 description = "A command line interface for executing Advent of Code solutions."
@@ -42,3 +42,4 @@ ram-run = { path = "../day-018-ram-run" }
 linen-layout = { path = "../day-019-linen-layout" }
 race-condition = { path = "../day-020-race-condition" }
 keypad-conundrum = { path = "../day-021-keypad-conundrum" }
+monkey-market = { path = "../day-022-monkey-market" }

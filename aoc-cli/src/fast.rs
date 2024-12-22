@@ -12,6 +12,7 @@ use historian_hysteria::HistorianHysteria;
 use hoof_it::HoofIt;
 use keypad_conundrum::KeypadConundrum;
 use linen_layout::LinenLayout;
+use monkey_market::MonkeyMarket;
 use mull_it_over::MullItOver;
 use plutonium_pebbles::PlutoniumPebbles;
 use print_queue::PrintQueue;

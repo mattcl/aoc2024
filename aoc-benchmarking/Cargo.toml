@@ -34,3 +34,4 @@ ram-run = { path = "../day-018-ram-run" }
 linen-layout = { path = "../day-019-linen-layout" }
 race-condition = { path = "../day-020-race-condition" }
 keypad-conundrum = { path = "../day-021-keypad-conundrum" }
+monkey-market = { path = "../day-022-monkey-market" }

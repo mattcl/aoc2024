@@ -17,6 +17,7 @@ use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
 use hoof_it::HoofIt;
 use keypad_conundrum::KeypadConundrum;
+use lan_party::LanParty;
 use linen_layout::LinenLayout;
 use monkey_market::MonkeyMarket;
 use mull_it_over::MullItOver;
@@ -208,5 +209,6 @@ generate_cli! {
     (RaceCondition, 20),
     (KeypadConundrum, 21),
     (MonkeyMarket, 22),
+    (LanParty, 23),
     // command_marker
 }

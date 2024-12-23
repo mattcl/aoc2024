@@ -11,6 +11,7 @@ use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
 use hoof_it::HoofIt;
 use keypad_conundrum::KeypadConundrum;
+use lan_party::LanParty;
 use linen_layout::LinenLayout;
 use monkey_market::MonkeyMarket;
 use mull_it_over::MullItOver;
@@ -51,6 +52,8 @@ pub fn run() -> anyhow::Result<()> {
         19 => serde_json::to_string(&LinenLayout::solve(&input)?)?,
         20 => serde_json::to_string(&RaceCondition::solve(&input)?)?,
         21 => serde_json::to_string(&KeypadConundrum::solve(&input)?)?,
+        22 => serde_json::to_string(&MonkeyMarket::solve(&input)?)?,
+        23 => serde_json::to_string(&LanParty::solve(&input)?)?,
         _ => "\"not implemented\"".into(),
     };
 

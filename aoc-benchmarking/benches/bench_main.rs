@@ -11,6 +11,7 @@ use guard_gallivant::GuardGallivant;
 use historian_hysteria::HistorianHysteria;
 use hoof_it::HoofIt;
 use keypad_conundrum::KeypadConundrum;
+use lan_party::LanParty;
 use linen_layout::LinenLayout;
 use monkey_market::MonkeyMarket;
 use mull_it_over::MullItOver;
@@ -167,6 +168,12 @@ aoc_benches! {
         day_022,
         "../day-022-monkey-market/input.txt",
         MonkeyMarket,
+        "Combined"
+    ),
+    (
+        day_023,
+        "../day-023-lan-party/input.txt",
+        LanParty,
         "Combined"
     ),
     // bench_marker

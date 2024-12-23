@@ -68,7 +68,6 @@ impl FromStr for MonkeyMarket {
                 let mut totals = vec![0_u16; SEQ_SIZE];
                 let mut seen = vec![usize::MAX; SEQ_SIZE];
                 let mut num_total = 0;
-                let mut best = 0;
 
                 for (i, n) in chunk.iter().enumerate() {
                     let mut cur = *n;
@@ -87,13 +86,12 @@ impl FromStr for MonkeyMarket {
                         if j > 2 && seen[adjusted_key] != i {
                             seen[adjusted_key] = i;
                             totals[adjusted_key] += cur_digit as u16;
-                            best = best.max(totals[adjusted_key])
                         }
                     }
                     num_total += cur;
                 }
 
-                (num_total, best, totals)
+                (num_total, 0, totals)
             })
             .reduce(
                 || (0_u64, 0_u16, vec![0_u16; SEQ_SIZE]),

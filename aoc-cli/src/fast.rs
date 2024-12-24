@@ -5,6 +5,7 @@ use bridge_repair::BridgeRepair;
 use ceres_search::CeresSearch;
 use chronospatial_computer::ChronospatialComputer;
 use claw_contraption::ClawContraption;
+use crossed_wires::CrossedWires;
 use disk_fragmenter::DiskFragmenter;
 use garden_groups::GardenGroups;
 use guard_gallivant::GuardGallivant;
@@ -54,6 +55,7 @@ pub fn run() -> anyhow::Result<()> {
         21 => serde_json::to_string(&KeypadConundrum::solve(&input)?)?,
         22 => serde_json::to_string(&MonkeyMarket::solve(&input)?)?,
         23 => serde_json::to_string(&LanParty::solve(&input)?)?,
+        24 => serde_json::to_string(&CrossedWires::solve(&input)?)?,
         _ => "\"not implemented\"".into(),
     };
 

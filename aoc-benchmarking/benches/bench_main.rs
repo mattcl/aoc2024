@@ -5,6 +5,7 @@ use bridge_repair::BridgeRepair;
 use ceres_search::CeresSearch;
 use chronospatial_computer::ChronospatialComputer;
 use claw_contraption::ClawContraption;
+use crossed_wires::CrossedWires;
 use disk_fragmenter::DiskFragmenter;
 use garden_groups::GardenGroups;
 use guard_gallivant::GuardGallivant;
@@ -174,6 +175,12 @@ aoc_benches! {
         day_023,
         "../day-023-lan-party/input.txt",
         LanParty,
+        "Combined"
+    ),
+    (
+        day_024,
+        "../day-024-crossed-wires/input.txt",
+        CrossedWires,
         "Combined"
     ),
     // bench_marker

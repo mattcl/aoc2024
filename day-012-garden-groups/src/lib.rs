@@ -1,7 +1,11 @@
 use std::{collections::VecDeque, str::FromStr};
 
 use aoc_plumbing::Problem;
-use aoc_std::{collections::CharGrid, directions::Cardinal, geometry::Location};
+use aoc_std::{
+    collections::{bitset::BitSet192, CharGrid},
+    directions::Cardinal,
+    geometry::Location,
+};
 
 // Corner checking BS
 const UL: u8 = Cardinal::North as u8 | Cardinal::West as u8;
@@ -138,13 +142,13 @@ impl Problem for GardenGroups {
 
 #[derive(Debug, Clone)]
 pub struct WideGrid {
-    rows: Vec<WideMap>,
+    rows: Vec<BitSet192>,
 }
 
 impl WideGrid {
     pub fn new(height: usize) -> Self {
         Self {
-            rows: vec![WideMap::default(); height],
+            rows: vec![BitSet192::ZERO; height],
         }
     }
 
@@ -154,37 +158,6 @@ impl WideGrid {
 
     pub fn contains(&self, location: &Location) -> bool {
         self.rows[location.row].contains(location.col)
-    }
-}
-
-/// Sigh, the whole 140x140 grid is a PITA. It might be better to make this
-/// align better, but I can't be bothered to do the math with more than two
-/// values.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct WideMap {
-    left: u128,
-    right: u16,
-}
-
-impl WideMap {
-    pub fn insert(&mut self, idx: usize) {
-        if idx < 128 {
-            self.left |= 1 << idx;
-        } else {
-            self.right |= 1 << (idx - 128);
-        }
-    }
-
-    pub fn contains(&self, idx: usize) -> bool {
-        if idx < 128 {
-            self.left & 1 << idx != 0
-        } else {
-            self.right & 1 << (idx - 128) != 0
-        }
-    }
-
-    pub fn area(&self) -> u32 {
-        self.right.count_ones() + self.left.count_ones()
     }
 }
 

@@ -33,19 +33,16 @@ impl<const N: i32> FromStr for RaceConditionGen<N> {
 
         let mut path = Vec::with_capacity(5000);
 
-        let mut cost = 0;
         loop {
             let v = grid.get(&cur).unwrap();
 
-            path.push((Point2D::new(cur.row as i32, cur.col as i32), cost));
+            path.push(Point2D::new(cur.row as i32, cur.col as i32));
 
             if *v == 'E' {
                 break;
             }
 
             grid.locations[cur.row][cur.col] = '#';
-
-            cost += 1;
 
             for (_dir, nloc, nv) in grid.cardinal_neighbors(&cur) {
                 if *nv == '#' {
@@ -63,13 +60,13 @@ impl<const N: i32> FromStr for RaceConditionGen<N> {
                 let mut p1 = 0;
                 let mut p2 = 0;
 
-                let (iloc, icost) = path[i];
+                let iloc = path[i];
 
                 let mut j = i + N as usize + 1;
                 while j < path.len() {
-                    let (jloc, jcost) = path[j];
+                    let jloc = path[j];
                     let dist = iloc.manhattan_dist(&jloc);
-                    if dist < 21 && jcost - icost - dist > N {
+                    if dist < 21 && (j - i) as i32 - dist > N {
                         if dist == 2 {
                             p1 += 1;
                         }

@@ -5,6 +5,7 @@ use bridge_repair::BridgeRepair;
 use ceres_search::CeresSearch;
 use chronospatial_computer::ChronospatialComputer;
 use claw_contraption::ClawContraption;
+use code_chronicle::CodeChronicle;
 use crossed_wires::CrossedWires;
 use disk_fragmenter::DiskFragmenter;
 use garden_groups::GardenGroups;
@@ -181,6 +182,12 @@ aoc_benches! {
         day_024,
         "../day-024-crossed-wires/input.txt",
         CrossedWires,
+        "Combined"
+    ),
+    (
+        day_025,
+        "../day-025-code-chronicle/input.txt",
+        CodeChronicle,
         "Combined"
     ),
     // bench_marker

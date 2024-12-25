@@ -11,6 +11,7 @@ use chronospatial_computer::ChronospatialComputer;
 use clap::{Args, CommandFactory, Parser, Subcommand};
 use clap_complete::{generate, shells::Zsh};
 use claw_contraption::ClawContraption;
+use code_chronicle::CodeChronicle;
 use crossed_wires::CrossedWires;
 use disk_fragmenter::DiskFragmenter;
 use garden_groups::GardenGroups;
@@ -212,5 +213,6 @@ generate_cli! {
     (MonkeyMarket, 22),
     (LanParty, 23),
     (CrossedWires, 24),
+    (CodeChronicle, 25),
     // command_marker
 }

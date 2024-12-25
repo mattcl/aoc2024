@@ -99,6 +99,7 @@ dependencies = [
  "ceres-search",
  "chronospatial-computer",
  "claw-contraption",
+ "code-chronicle",
  "criterion",
  "crossed-wires",
  "disk-fragmenter",
@@ -124,7 +125,7 @@ dependencies = [
 
 [[package]]
 name = "aoc-cli"
-version = "0.24.1"
+version = "0.25.0"
 dependencies = [
  "anyhow",
  "aoc-plumbing",
@@ -134,6 +135,7 @@ dependencies = [
  "clap",
  "clap_complete",
  "claw-contraption",
+ "code-chronicle",
  "crossed-wires",
  "disk-fragmenter",
  "garden-groups",
@@ -471,6 +473,18 @@ checksum = "f46ad14479a25103f283c0f10005961cf086d8dc42205bb44c46ac563475dca6"
 
 [[package]]
 name = "claw-contraption"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-plumbing",
+ "aoc-std",
+ "nom",
+ "rustc-hash",
+ "serde",
+]
+
+[[package]]
+name = "code-chronicle"
 version = "0.1.0"
 dependencies = [
  "anyhow",

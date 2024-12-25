@@ -37,3 +37,4 @@ keypad-conundrum = { path = "../day-021-keypad-conundrum" }
 monkey-market = { path = "../day-022-monkey-market" }
 lan-party = { path = "../day-023-lan-party" }
 crossed-wires = { path = "../day-024-crossed-wires" }
+code-chronicle = { path = "../day-025-code-chronicle" }

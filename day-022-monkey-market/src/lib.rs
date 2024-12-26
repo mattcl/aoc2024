@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{str::FromStr, usize};
 
 use aoc_plumbing::Problem;
 use nom::{
@@ -34,20 +34,37 @@ use rayon::prelude::*;
 // const SM_SEQ_MAX: usize = 0b01111011000100101001;
 
 // N % 16,777,216 is equal to N & MOD_MASK;
-const MOD_MASK: u64 = (1 << 24) - 1;
-const SEQ_MASK: usize = (1 << 20) - 1;
+const MOD_MASK: i64 = (1 << 24) - 1;
+const SEQ_MASK: i64 = (1 << 20) - 1;
 // Under our encoding scheme, the max value is the following sequence
 //                       9     0     0     0
 const SEQ_MAX: usize = 0b10010_01001_01001_01001;
 // and the minimum is   -9     0     0     0
-const SEQ_MIN: usize = 0b00000_01001_01001_01001;
-const SEQ_SIZE: usize = SEQ_MAX + 1 - SEQ_MIN;
+const SEQ_MIN: i64 = 0b00000_01001_01001_01001;
+const SEQ_SIZE: usize = SEQ_MAX + 1 - (SEQ_MIN as usize);
 const DESIRED_CHUNKS: usize = 4;
+
+const DESIRED_AGG_CHUNKS: usize = 1_000;
+const AGG_CHUNK_SIZE: usize = SEQ_SIZE / DESIRED_AGG_CHUNKS;
 
 #[derive(Debug, Clone)]
 pub struct MonkeyMarket {
-    p1: u64,
+    p1: i64,
     p2: u16,
+}
+
+pub struct Chunk {
+    values: Vec<i64>,
+    totals: Vec<u16>,
+}
+
+impl Chunk {
+    pub fn new(vals: &[i64]) -> Self {
+        Self {
+            values: vals.to_vec(),
+            totals: Vec::default(),
+        }
+    }
 }
 
 impl FromStr for MonkeyMarket {
@@ -62,85 +79,98 @@ impl FromStr for MonkeyMarket {
             } else {
                 1
             };
-        let (p1, p2, _totals) = initial_numbers
-            .par_chunks(chunk_size)
+
+        let mut chunks = initial_numbers
+            .chunks(chunk_size)
+            .map(Chunk::new)
+            .collect::<Vec<_>>();
+
+        let p1 = chunks
+            .par_iter_mut()
             .map(|chunk| {
-                let mut totals = vec![0_u16; SEQ_SIZE];
-                let mut seen = vec![usize::MAX; SEQ_SIZE];
                 let mut num_total = 0;
 
-                for (i, n) in chunk.iter().enumerate() {
-                    let mut cur = *n;
-                    let mut key: usize = 0;
-                    let mut prev = (cur % 10) as i8;
+                let mut seen = vec![usize::MAX; SEQ_SIZE];
+                chunk.totals = vec![0; SEQ_SIZE];
+
+                for i in 0..chunk.values.len() {
+                    let mut cur = chunk.values[i];
+                    let mut key: i64 = 0;
+                    let mut prev = cur % 10;
 
                     // not doing this in the loop saves us a little bit of time
                     // because we don't have to check an additional condition in
                     // the loop
                     cur = next_number(cur);
-                    let cur_digit = (cur % 10) as i8;
-                    let delta: i8 = cur_digit - prev;
+                    let cur_digit = cur % 10;
+                    let delta = cur_digit - prev;
                     prev = cur_digit;
-                    key = (key << 5) | (delta + 9) as usize;
+                    key = (key << 5) | (delta + 9);
 
                     cur = next_number(cur);
-                    let cur_digit = (cur % 10) as i8;
-                    let delta: i8 = cur_digit - prev;
+                    let cur_digit = cur % 10;
+                    let delta = cur_digit - prev;
                     prev = cur_digit;
-                    key = (key << 5) | (delta + 9) as usize;
+                    key = (key << 5) | (delta + 9);
 
                     cur = next_number(cur);
-                    let cur_digit = (cur % 10) as i8;
-                    let delta: i8 = cur_digit - prev;
+                    let cur_digit = cur % 10;
+                    let delta = cur_digit - prev;
                     prev = cur_digit;
-                    key = (key << 5) | (delta + 9) as usize;
+                    key = (key << 5) | (delta + 9);
 
                     for _ in 0..1997 {
                         cur = next_number(cur);
-                        let cur_digit = (cur % 10) as i8;
-                        let delta: i8 = cur_digit - prev;
+                        let cur_digit = cur % 10;
+                        let delta = cur_digit - prev;
                         prev = cur_digit;
-                        key = ((key << 5) & SEQ_MASK) | (delta + 9) as usize;
+                        key = ((key << 5) & SEQ_MASK) | (delta + 9);
 
-                        let adjusted_key = key - SEQ_MIN;
+                        let adjusted_key = (key - SEQ_MIN) as usize;
 
                         if seen[adjusted_key] != i {
                             seen[adjusted_key] = i;
-                            totals[adjusted_key] += cur_digit as u16;
+                            chunk.totals[adjusted_key] += cur_digit as u16;
                         }
                     }
                     num_total += cur;
                 }
-
-                (num_total, 0, totals)
+                num_total
             })
-            .reduce(
-                || (0_u64, 0_u16, vec![0_u16; SEQ_SIZE]),
-                |(mut total_num, mut best, mut acc),
-                 (chunk_total_num, chunk_best, chunk_totals)| {
-                    total_num += chunk_total_num;
-                    best = best.max(chunk_best);
-                    for i in 0..acc.len() {
-                        acc[i] += chunk_totals[i];
-                        best = best.max(acc[i]);
+            .sum();
+
+        let best_aggregator = (0..(SEQ_SIZE / AGG_CHUNK_SIZE)).collect::<Vec<_>>();
+
+        let p2 = best_aggregator
+            .into_par_iter()
+            .map(|base_idx| {
+                let mut max = 0;
+                let base = base_idx * AGG_CHUNK_SIZE;
+                for i in base..((base + AGG_CHUNK_SIZE).min(SEQ_MAX)) {
+                    let mut cur_tot = 0;
+                    for chunk in chunks.iter() {
+                        cur_tot += chunk.totals[i];
                     }
-                    (total_num, best, acc)
-                },
-            );
+                    max = max.max(cur_tot);
+                }
+                max
+            })
+            .max()
+            .unwrap();
 
         Ok(Self { p1, p2 })
     }
 }
 
 #[inline]
-fn next_number(input: u64) -> u64 {
+fn next_number(input: i64) -> i64 {
     let mut a = (input ^ (input << 6)) & MOD_MASK;
     a = a ^ (a >> 5);
     a ^ ((a << 11) & MOD_MASK)
 }
 
-fn parse_numbers(input: &str) -> IResult<&str, Vec<u64>> {
-    separated_list1(newline, complete::u64)(input)
+fn parse_numbers(input: &str) -> IResult<&str, Vec<i64>> {
+    separated_list1(newline, complete::i64)(input)
 }
 
 impl Problem for MonkeyMarket {
@@ -149,7 +179,7 @@ impl Problem for MonkeyMarket {
     const README: &'static str = include_str!("../README.md");
 
     type ProblemError = anyhow::Error;
-    type P1 = u64;
+    type P1 = i64;
     type P2 = u16;
 
     fn part_one(&mut self) -> Result<Self::P1, Self::ProblemError> {

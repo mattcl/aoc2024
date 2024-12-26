@@ -74,7 +74,28 @@ impl FromStr for MonkeyMarket {
                     let mut key: usize = 0;
                     let mut prev = (cur % 10) as i8;
 
-                    for j in 0..2000 {
+                    // not doing this in the loop saves us a little bit of time
+                    // because we don't have to check an additional condition in
+                    // the loop
+                    cur = next_number(cur);
+                    let cur_digit = (cur % 10) as i8;
+                    let delta: i8 = cur_digit - prev;
+                    prev = cur_digit;
+                    key = (key << 5) | (delta + 9) as usize;
+
+                    cur = next_number(cur);
+                    let cur_digit = (cur % 10) as i8;
+                    let delta: i8 = cur_digit - prev;
+                    prev = cur_digit;
+                    key = (key << 5) | (delta + 9) as usize;
+
+                    cur = next_number(cur);
+                    let cur_digit = (cur % 10) as i8;
+                    let delta: i8 = cur_digit - prev;
+                    prev = cur_digit;
+                    key = (key << 5) | (delta + 9) as usize;
+
+                    for _ in 0..1997 {
                         cur = next_number(cur);
                         let cur_digit = (cur % 10) as i8;
                         let delta: i8 = cur_digit - prev;
@@ -83,7 +104,7 @@ impl FromStr for MonkeyMarket {
 
                         let adjusted_key = key - SEQ_MIN;
 
-                        if j > 2 && seen[adjusted_key] != i {
+                        if seen[adjusted_key] != i {
                             seen[adjusted_key] = i;
                             totals[adjusted_key] += cur_digit as u16;
                         }

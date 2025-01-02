@@ -247,15 +247,17 @@ fn bfs_junction(
                     continue;
                 }
 
-                next.push((
-                    Node {
-                        location: l,
-                        facing: d,
-                    },
-                    *orig_facing,
-                    dist + 1,
-                    next_cost,
-                ));
+                if l != start {
+                    next.push((
+                        Node {
+                            location: l,
+                            facing: d,
+                        },
+                        *orig_facing,
+                        dist + 1,
+                        next_cost,
+                    ));
+                }
             }
         }
 

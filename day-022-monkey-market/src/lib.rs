@@ -1,4 +1,4 @@
-use std::{str::FromStr, usize};
+use std::str::FromStr;
 
 use aoc_plumbing::Problem;
 use nom::{
@@ -8,44 +8,19 @@ use nom::{
 };
 use rayon::prelude::*;
 
-// -9 Ob00000  0
-// -8 Ob00001  1
-// -7 Ob00010  2
-// -6 Ob00011  3
-// -5 Ob00100  4
-// -4 Ob00101  5
-// -3 Ob00110  6
-// -2 Ob00111  7
-// -1 Ob01000  8
-//  0 Ob01001  9
-//  1 Ob01010  10
-//  2 Ob01011  11
-//  3 Ob01100  12
-//  4 Ob01101  13
-//  5 Ob01110  14
-//  6 Ob01111  15
-//  7 Ob10000  16
-//  8 Ob10001  17
-//  9 Ob10010  18
-//
-//  so, really, we only need a few numbers beyond
-//  so the biggest number that only needs 19 bits would be
-//                          6    3    0    0
-// const SM_SEQ_MAX: usize = 0b01111011000100101001;
-
-// N % 16,777,216 is equal to N & MOD_MASK;
 const MOD_MASK: i64 = (1 << 24) - 1;
-const SEQ_MASK: i64 = (1 << 20) - 1;
-// Under our encoding scheme, the max value is the following sequence
-//                       9     0     0     0
-const SEQ_MAX: usize = 0b10010_01001_01001_01001;
-// and the minimum is   -9     0     0     0
-const SEQ_MIN: i64 = 0b00000_01001_01001_01001;
-const SEQ_SIZE: usize = SEQ_MAX + 1 - (SEQ_MIN as usize);
+
+// max set of diffs of -9,0,0,0, (base-19 I999)
+const SEQ_MAX: usize = 126891;
+const SEQ_SIZE: usize = SEQ_MAX + 1;
 const DESIRED_CHUNKS: usize = 4;
 
 const DESIRED_AGG_CHUNKS: usize = 1_000;
 const AGG_CHUNK_SIZE: usize = SEQ_SIZE / DESIRED_AGG_CHUNKS;
+
+const SLOT_1: i64 = 19 * 19 * 19;
+const SLOT_2: i64 = 19 * 19;
+const SLOT_3: i64 = 19;
 
 #[derive(Debug, Clone)]
 pub struct MonkeyMarket {
@@ -95,7 +70,7 @@ impl FromStr for MonkeyMarket {
 
                 for i in 0..chunk.values.len() {
                     let mut cur = chunk.values[i];
-                    let mut key: i64 = 0;
+                    // let mut key: usize = 0;
                     let mut prev = cur % 10;
 
                     // not doing this in the loop saves us a little bit of time
@@ -103,34 +78,38 @@ impl FromStr for MonkeyMarket {
                     // the loop
                     cur = next_number(cur);
                     let cur_digit = cur % 10;
-                    let delta = cur_digit - prev;
+                    let mut delta1 = cur_digit - prev + 9;
                     prev = cur_digit;
-                    key = (key << 5) | (delta + 9);
 
                     cur = next_number(cur);
                     let cur_digit = cur % 10;
-                    let delta = cur_digit - prev;
+                    let mut delta2 = cur_digit - prev + 9;
                     prev = cur_digit;
-                    key = (key << 5) | (delta + 9);
 
                     cur = next_number(cur);
                     let cur_digit = cur % 10;
-                    let delta = cur_digit - prev;
+                    let mut delta3 = cur_digit - prev + 9;
                     prev = cur_digit;
-                    key = (key << 5) | (delta + 9);
 
                     for _ in 0..1997 {
                         cur = next_number(cur);
                         let cur_digit = cur % 10;
-                        let delta = cur_digit - prev;
+                        let delta = cur_digit - prev + 9;
                         prev = cur_digit;
-                        key = ((key << 5) & SEQ_MASK) | (delta + 9);
+                        // key = ((key << 5) & SEQ_MASK) | (delta + 9);
+                        let key =
+                            ((SLOT_1 * delta1) + (SLOT_2 * delta2) + (SLOT_3 * delta3) + delta)
+                                as usize;
 
-                        let adjusted_key = (key - SEQ_MIN) as usize;
+                        delta1 = delta2;
+                        delta2 = delta3;
+                        delta3 = delta;
 
-                        if seen[adjusted_key] != i {
-                            seen[adjusted_key] = i;
-                            chunk.totals[adjusted_key] += cur_digit as u16;
+                        // let adjusted_key = (key - SEQ_MIN) as usize;
+
+                        if seen[key] != i {
+                            seen[key] = i;
+                            chunk.totals[key] += cur_digit as u16;
                         }
                     }
                     num_total += cur;
